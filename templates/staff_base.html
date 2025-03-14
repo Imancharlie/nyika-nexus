@@ -1,0 +1,1003 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nyika Nexus Management{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Previous styles remain the same */
+        :root {
+            --primary: #2A5A3B;
+            --primary-dark: rgb(39, 126, 70);
+            --secondary: #f97316;
+            --background: #f8fafc;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --sidebar-width: 250px;
+        }
+
+        /* Previous styles remain... */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--background);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            position: fixed;
+            left: 1rem;
+            top: 1rem;
+            z-index: 1001;
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            background: var(--background);
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header/Topbar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 4rem; /* Space for menu toggle button */
+            }
+            footer {
+                display: none;
+        }
+        }
+
+        /* Rest of your styles remain the same... */
+        /* (Include all the other styles from the previous version) */
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--background);
+        }
+
+        .nav-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer Styles */
+
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--background);
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        /* Update main content wrapper styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            background: var(--background);
+            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - 70px);
+            margin-top: 70px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Content wrapper to push footer down */
+        .content-wrapper {
+            flex: 1;
+            padding-bottom: 2rem; /* Space before footer */
+        }
+
+        /* Updated Footer Styles */
+
+        /* Simplified Navbar Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: var(--sidebar-width);
+    height: 80px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    z-index: 900;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.navbar-brand i {
+    font-size: 1.5rem;
+}
+
+.navbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Notification Styles */
+.notifications {
+    position: relative;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.notifications i {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    transition: color 0.2s ease;
+}
+
+.notifications:hover i {
+    color: var(--primary);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--danger);
+    color: white;
+    font-size: 0.75rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.username {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.profile-menu {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.profile-image:hover {
+    transform: scale(1.05);
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.profile-menu:hover .profile-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.profile-link:hover {
+    background-color: var(--background);
+}
+
+.profile-link i {
+    width: 1.25rem;
+    text-align: center;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--background);
+    margin: 0.5rem 0;
+}
+
+.text-danger {
+    color: var(--danger) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        left: 0;
+        padding: 0 1rem;
+    }
+
+    .username {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-brand span {
+        font-size: 1.1rem;
+    }
+
+    .notifications {
+        padding: 0.25rem;
+    }
+}
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Footer Responsive Styles */
+        .footer {
+            background: white;
+            width: calc(115% - var(--sidebar-width));
+
+            padding: 2rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            bottom: 0;
+            transition: all 0.3s ease;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Large screens (1200px and up) */
+        @media (min-width: 1200px) {
+            .footer-content {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Medium screens (992px to 1199px) */
+        @media (max-width: 1199px) {
+            .footer-content {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Tablet screens (768px to 991px) */
+        @media (max-width: 991px) {
+            .navbar {
+                padding: 0 1rem;
+            }
+
+            .nav-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        ul {
+    list-style: none; /* Remove default bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    margin-bottom: 10px; /* Add space between links */
+}
+
+ul li a {
+    text-decoration: none;
+    color: black; /* Adjust color as needed */
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+ul li a:hover {
+    color: #f4a261; /* Change color on hover */
+}
+        /* Mobile screens (up to 767px) */
+        @media (max-width: 767px) {
+            .navbar {
+                left: 0;
+                height: auto;
+                min-height: 60px;
+                padding: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .navbar-brand {
+                font-size: 1.2rem;
+                margin-left: 3rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .navbar-nav {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem 0;
+            }
+
+            .navbar-nav.active {
+                display: flex;
+            }
+
+            .nav-btn {
+                width: 100%;
+                text-align: center;
+                padding: 0.8rem;
+            }
+
+            .footer {
+                width: 100%;
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .footer-section {
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        /* Small mobile screens (up to 480px) */
+        @media (max-width: 480px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .footer {
+                padding: 1rem;
+            }
+
+            .footer-bottom {
+                font-size: 0.9rem;
+            }
+        }
+                @media (min-width: 990px) {
+            .nav-link {
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+
+
+            .main-content {
+                margin-left: 0;
+            }
+        }/* Add these styles to your existing CSS */
+        .nav-menu .has-submenu .nav-link:after {
+            content: '\f105'; /* FontAwesome right arrow */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            transition: transform 0.3s;
+        }
+
+        .nav-menu .has-submenu.open .nav-link:after {
+            transform: rotate(90deg);
+        }
+
+        .submenu {
+            display: none;
+            margin-left: 2.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .submenu.active {
+            display: block;
+        }
+
+        .submenu .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        <!-- Styling for the toggle switch -->
+    .translate-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 20px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+    }
+
+    .slider::before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #4caf50;
+    }
+
+    input:checked + .slider::before {
+        transform: translateX(14px);
+    }
+
+    /* Container Styling */
+    #messages-container {
+        position: fixed;
+        top: 3%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        text-align: center;
+    }
+
+    /* Message Styling */
+    .message {
+        background: #e8f5e9; /* Pale green background */
+        color: #256029;
+        padding: 1rem;
+        margin: 1rem auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        font-family: 'Arial', sans-serif;
+        font-size: 1rem;
+        animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-out 4.5s;
+    }
+
+    /* Slide-in and Fade-out Animations */
+    @keyframes slideIn {
+        from {
+            transform: translateY(-30%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+
+
+ </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navbar code remains the same -->
+
+<nav class="navbar">
+    <a href="#" class="navbar-brand">
+        <i class="fas fa-leaf"></i>
+        <span>Nyika Nexus</span>
+    </a>
+    <div class="navbar-profile">
+        <!-- Translation Toggle -->
+        <div class="translate-toggle">
+            <label class="switch">
+                <input type="checkbox" id="translateSwitch">
+                <span class="slider round"></span>
+            </label>
+            <span id="translateLabel">Translate</span>
+        </div>
+
+        <!-- Notifications and Profile -->
+
+        <span class="username">{{ request.user.username }}</span>
+        <div class="profile-menu">
+            <img src="{% static 'images/profile.png' %}" alt="Profile" class="profile-image">
+            <div class="profile-dropdown">
+                <a href="{% url 'my_profile' %}" class="profile-link"><i class="fas fa-user"></i> My Profile</a>
+                <div class="dropdown-divider"></div>
+                <a href="{% url 'logout' %}" class="profile-link text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+    <!-- Previous sidebar and main content code remains the same -->
+    <button class="menu-toggle" aria-label="Toggle Menu">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <i class="fas fa-leaf"></i>
+                Nyika Nexus
+            </a>
+        </div>
+        <ul class="nav-menu">
+    <li class="nav-item">
+        <a href="{% url 'staff_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+            <i class="fas fa-user-cog"></i>
+            <span data-en="Staff Dashboard" data-sw="Dashibodi">Staff Dashboard</span>
+        </a>
+    </li>
+
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link">
+            <i class="fas fa-users"></i>
+            <span data-en="Posts" data-sw="Chapisho">Posts</span>
+        </a>
+        <ul class="submenu">
+            <li>
+                <a href="{% url 'add_post' %}" class="nav-link">
+                    <i class="fas fa-plus"></i>
+                    <span data-en="Create Post" data-sw="Chapisha Chapisho">Create Post</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'post' %}" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    <span data-en="View Posts" data-sw="Tazama Chapisho">View Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin_view_posts' %}" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    <span data-en="Delete" data-sw="Futa">Delete</span>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    <li class="nav-item">
+        <a href="{% url 'view_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}">
+            <i class="fas fa-clipboard-list"></i>
+            <span data-en="View Orders" data-sw="Tazama Oda">View Orders</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{% url 'staff_challenges'%}" class="nav-link {% if request.resolver_match.url_name == 'challenges' %}active{% endif %}">
+            <i class="fas fa-exclamation-circle"></i>
+            <span data-en="View Challenges" data-sw="Tazama Changamoto">View Challenges</span>
+        </a>
+    </li>
+
+    <li class="nav-item has-submenu">
+        <a href="#" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span data-en="Reports" data-sw="Ripoti">Reports</span>
+        </a>
+        <ul class="submenu">
+            <li>
+                <a href="{% url 'create_report' %}" class="nav-link">
+                    <i class="fas fa-plus"></i>
+                    <span data-en="Create Reports" data-sw="Andaa Ripoti">Create</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'view_report' %}" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    <span data-en="View Reports" data-sw="Tazama Ripoti">View</span>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    {% block extranav %}{% endblock extranav %}
+
+    <li class="nav-item">
+        <a href="{% url 'setting'%}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+            <i class="fas fa-cog"></i>
+            <span data-en="Settings" data-sw="Mipangilio">Settings</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{% url 'admin:index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+            <i class="fas fa-tools"></i>
+            <span data-en="Database" data-sw="Hifadhidata">Database</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{% url 'logout'%}" class="nav-link {% if request.resolver_match.url_name == 'logout' %}active{% endif %}">
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-en="Logout" data-sw="Ondoka">Logout</span>
+        </a>
+    </li>
+</ul>
+
+    </aside>
+    <!-- Sidebar code remains the same -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Your page content goes here -->
+            {% if messages %}
+                <div id="messages-container">
+                    {% for message in messages %}
+                        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <footer class="footer">
+
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Nyika Nexus</h3>
+                <p>Empowering sustainable development through innovative management solutions.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="https://x.com/nyikaventure?s=09"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/in/nyika-venture-5b5715285?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app "><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/nyikaventure_?igsh=dHp2ZnV5cWVqMnlq "><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+               <ul>
+                    <li><a href="https://www.nyikaventures.co.tz">Nyika Venture</a></li>
+                    <li><a href="https://ayute.africa">Ayute Africa</a></li>
+                    <li><a href="https://www.kilimo.go.tz/">Wizara ya Kilimo</a></li>
+                    <li><a href="https://www.fao.org/home/en/">FAO</a></li>
+                </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <p><i class="fas fa-phone"></i> +255 742356679</p>
+                    <p><i class="fas fa-envelope"></i>info@nyikaventures.co.tz</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Geita, Tanzania</p>
+                </div>
+
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Nyika Nexus. All rights reserved.</p>
+        </div>
+    </footer>
+    </main>
+
+    {% block extra_js %}{% endblock %}
+    <!-- Scripts remain the same -->
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const messages = document.querySelectorAll('.message');
+    const audio = new Audio("{% static 'audio/notification.mp3' %}");
+    audio.play(); // Play notification sound
+
+    messages.forEach(message => {
+        setTimeout(() => {
+            message.remove();
+        }, 5000); // Remove message after 5 seconds
+    });
+});
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const translateSwitch = document.getElementById('translateSwitch');
+    const translateLabel = document.getElementById('translateLabel');
+    const translatableElements = document.querySelectorAll('[data-en]'); // Select elements with translations
+
+    // Check and apply stored translation preference
+    const isTranslated = localStorage.getItem('isTranslated') === 'true';
+
+    if (isTranslated) {
+        translateSwitch.checked = true;
+        translateLabel.textContent = 'Swahili';
+        applyTranslation(true); // Apply Swahili translation
+    }
+
+    // Event listener for toggle switch
+    translateSwitch.addEventListener('change', () => {
+        const translateToSwahili = translateSwitch.checked;
+        translateLabel.textContent = translateToSwahili ? 'Swahili' : 'Translate';
+
+        // Save the user's preference in localStorage
+        localStorage.setItem('isTranslated', translateToSwahili);
+
+        // Apply or revert translations
+        applyTranslation(translateToSwahili);
+    });
+
+    // Function to toggle translations
+    function applyTranslation(translateToSwahili) {
+        translatableElements.forEach(element => {
+            const translation = translateToSwahili ? element.getAttribute('data-sw') : element.getAttribute('data-en');
+            if (translation) {
+                element.textContent = translation;
+            }
+        });
+    }
+});
+        // Add to your existing script
+            document.querySelectorAll('.has-submenu').forEach(item => {
+                item.querySelector('.nav-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    item.classList.toggle('open');
+                    item.querySelector('.submenu').classList.toggle('active');
+                });
+            });
+        // Mobile menu functionality
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Toggle sidebar when menu button is clicked
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+
+        // Close sidebar when clicking overlay
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const isClickInside = sidebar.contains(e.target) || menuToggle.contains(e.target);
+                if (!isClickInside && sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            }
+        });
+
+        // Prevent sidebar from closing when clicking inside it
+        sidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

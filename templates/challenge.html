@@ -1,0 +1,205 @@
+{% extends base_template %}
+
+{% block title %}Report a Challenge - Nyika Nexus{% endblock %}
+
+{% block content %}
+<div class="content-wrapper" data-language="en">
+    <!-- Header Section -->
+    <div class="topbar">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2" data-en="Report Your Challenge" data-sw="Ripoti Changamoto Yako">
+                Report Your Challenge
+            </h2>
+            <p class="text-gray-600" data-en="Let our experts assist you with your farming challenges" data-sw="Wacha wataalamu wetu wakusaidie na changamoto zako za kilimo">
+                Let our experts assist you with your farming challenges
+            </p>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-500" data-en="Need help?" data-sw="Unahitaji msaada?">
+                Need help?
+            </span>
+            <a href="#" class="nav-btn primary">
+                <i class="fas fa-question-circle mr-2"></i>
+                <span data-en="Get Support" data-sw="Pata Msaada">Get Support</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Form Section -->
+    <div style="background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+        <div style="padding: 2rem;">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Challenge Type Selection -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="title" style="display: block; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;"
+                           data-en="Title" data-sw="Kichwa">
+                        Title
+                        <span style="color: var(--danger);">*</span>
+                    </label>
+                    <textarea
+                        id="title"
+                        name="title"
+                        rows="1"
+                        required
+                        placeholder="Please name your issue..."
+                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; resize: vertical; transition: all 0.3s ease;"
+                    ></textarea>
+                    <label for="challenge_type" style="display: block; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;"
+                           data-en="Challenge Type" data-sw="Aina ya Changamoto">
+                        Challenge Type
+                        <span style="color: var(--danger);">*</span>
+                    </label>
+                    <select id="challenge_type" name="challenge_type" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background-color: white; transition: all 0.3s ease;">
+                        <option value="" data-en="Select a challenge type" data-sw="Chagua aina ya changamoto">
+                            Select a challenge type
+                        </option>
+                        <option value="soil_fertility" data-en="Soil Fertility" data-sw="ukosefu wa rutuba kwenye Udongo">
+                            <i class="fas fa-seedling"></i> Soil Fertility
+                        </option>
+                        <option value="pest_disease" data-en="Pests and Diseases" data-sw="Wadudu na Magonjwa">
+                            <i class="fas fa-bug"></i> Pests and Diseases
+                        </option>
+                        <option value="Software_issue" data-en="Problem in the Website" data-sw="Shida kwenye Tovuti">
+                            <i class="fas fa-cloud-sun"></i> Problem in the Website
+                        </option>
+                        <option value="Training" data-en="Requesting Training and Skills" data-sw="Ombi la Mafunzo na Ujuzi">
+                            <i class="fas fa-store"></i> Requesting Training and Skills
+                        </option>
+                        <option value="other" data-en="Other" data-sw="Mengine">
+                            <i class="fas fa-question-circle"></i> Other
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Challenge Description -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="description" style="display: block; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;"
+                           data-en="Describe Your Challenge" data-sw="Elezea Changamoto Yako">
+                        Describe Your Challenge
+                        <span style="color: var(--danger);">*</span>
+                    </label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="5"
+                        required
+                        placeholder="Please provide specific details about the issue you're experiencing..."
+                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; resize: vertical; transition: all 0.3s ease;"
+                    ></textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;"
+                           data-en="Upload Images (Optional)" data-sw="Pakia Picha (Hiari)">
+                        Upload Images (Optional)
+                    </label>
+                    <div style="border: 2px dashed #e2e8f0; border-radius: 0.5rem; padding: 2rem; text-align: center; transition: all 0.3s ease;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                        <div style="margin-bottom: 1rem;">
+                            <input type="file" id="image" name="image" accept="image/*" style="display: none;">
+                            <label for="image" class="nav-btn primary" style="cursor: pointer;">
+                                <i class="fas fa-plus mr-2"></i>
+                                <span data-en="Choose Files" data-sw="Chagua Faili">Choose Files</span>
+                            </label>
+                        </div>
+                        <p style="color: var(--text-light); font-size: 0.875rem;"
+                           data-en="Supported formats: PNG, JPG, GIF (Max file size: 10MB)"
+                           data-sw="Format zilizozuiliwa: PNG, JPG, GIF (Ukubwa wa faili mkubwa: 10MB)">
+                            Supported formats: PNG, JPG, GIF (Max file size: 10MB)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="nav-btn primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    <span data-en="Submit Challenge" data-sw="Tuma Changamoto">Submit Challenge</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom styles for form elements */
+    select:focus, textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(42, 90, 59, 0.1);
+        outline: none;
+    }
+
+    /* File upload hover effect */
+    .file-upload:hover {
+        border-color: var(--primary);
+        background: rgba(42, 90, 59, 0.05);
+    }
+
+    /* Custom scrollbar for textarea */
+    textarea::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    textarea::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 4px;
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+    @media (max-width: 768px) {
+
+
+        .topbar h2 {
+            : 0;
+        }
+        .topbar p {
+            display: none;
+        }
+        .topbar .flex{
+            display: none;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // File upload preview and validation
+    const fileInput = document.getElementById('image');
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB');
+                this.value = '';
+            }
+        }
+    });
+
+    // Form validation enhancement
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const description = document.getElementById('description').value.trim();
+        const challengeType = document.getElementById('challenge_type').value;
+
+        if (description.length < 20) {
+            e.preventDefault();
+            alert('Please provide a more detailed description (at least 20 characters)');
+        }
+
+        if (!challengeType) {
+            e.preventDefault();
+            alert('Please select a challenge type');
+        }
+    });
+});
+</script>
+{% endblock %}

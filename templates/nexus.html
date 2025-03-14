@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyika Nexus | Soil analysis and fumigation</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+            --primary: #2A5A3B;
+            --primary-dark:rgb(39, 126, 70);
+            --secondary: #f97316;
+            --background: #f8fafc;
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--background);
+        }
+
+        /* Modern Glassmorphism Nav */
+        nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .menu a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .menu a:hover {
+            color: var(--primary);
+        }
+
+        header {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)),
+            url('{% static "images/Background.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+        }
+        @media (max-width: 768px) {
+    header {
+        position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)),
+            url('{% static "images/nexus.png" %}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+    }
+}
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(1px);
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: #F5B841;
+            color: #000;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .cta-button:hover {
+            background-color: transparent;
+            border-color: #F5B841;
+            color: #F5B841;
+        }
+
+        .cta-button i {
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover i {
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.6rem;
+            }
+        }
+
+
+        .cta-button {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 1rem;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background:rgb(245, 250, 270);
+        }
+
+        .feature-icon {
+            background: var(--primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        /* Statistics Section */
+        .statistics {
+            position: relative;
+            padding: 6rem 2rem;
+            color: #fff;
+            background: url({% static "images/wooden-house.jpg" %}) no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            color: #fff;
+        }
+
+        .stat-card h3 {
+            font-size: 3rem;
+            color:rgb(252, 252, 253);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 1.2rem;
+            color: rgb(252, 252, 253);;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .testimonial-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: 1rem;
+            position: relative;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-quote {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text);
+            color: white;
+            padding: 4rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-icon {
+            color: white;
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Scroll to Top Button */
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #scrollToTopBtn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+
+            .menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+    .statistics {
+        background-image: url({% static "images/wooden-house.jpg" %}) /* Optional mobile-specific image */
+        padding: 2rem 1rem;
+    }
+}
+.video-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background: #000;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+                0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Custom video controls styling */
+  video::-webkit-media-controls-panel {
+    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+  }
+
+  /* Media queries for different screen sizes */
+  @media (max-width: 768px) {
+    .video-section {
+      margin: 1rem auto;
+    }
+
+    .video-container {
+      border-radius: 0.5rem;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .video-container {
+      box-shadow: 0 25px 30px -12px rgb(0 0 0 / 0.25);
+    }
+  }
+        /* Previous styles remain the same until animations */
+
+        /* Scroll Animation Classes */
+        .scroll-reveal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .scroll-reveal.fade-bottom {
+            transform: translateY(50px);
+        }
+
+        .scroll-reveal.fade-left {
+            transform: translateX(-50px);
+        }
+
+        .scroll-reveal.fade-right {
+            transform: translateX(50px);
+        }
+
+        .scroll-reveal.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(0, 0);
+        }
+
+
+        /* FAQ Section Styles */
+        .faq {
+            background: #f8fafc;
+            padding: 6rem 2rem;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .faq-question i {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding-bottom: 1.5rem;
+        }
+
+        /* Feedback Form Styles */
+        .feedback {
+            background: linear-gradient(135deg,rgb(121, 133, 159),rgb(7, 75, 51));
+            padding: 6rem 2rem;
+            color: white;
+        }
+
+        .feedback-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feedback form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .feedback input,
+        .feedback textarea {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .feedback input::placeholder,
+        .feedback textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .feedback button {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .feedback button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        @media (max-width: 768px) {
+            #about-us .fa {
+              font-size: 1.5rem;
+            }
+
+            #about-us div {
+              width: 100%;
+              margin-bottom: 20px;
+            }
+          }
+          /* Base responsive rules */
+* {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Responsive images */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Mobile-first adjustments */
+@media (max-width: 768px) {
+    /* Navigation */
+    .nav-content {
+        padding: 0.5rem 1rem;
+    }
+
+    /* Hero section */
+    .hero-content {
+        padding: 1rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Features section */
+    .features {
+        padding: 3rem 1rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Statistics section */
+    .statistics {
+        padding: 3rem 1rem;
+    }
+
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+
+    /* Testimonials */
+    .testimonials {
+        padding: 3rem 1rem;
+    }
+
+    .testimonial-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* FAQ section */
+    .faq-container {
+        padding: 0 1rem;
+    }
+
+    .faq-question {
+        padding: 1rem;
+    }
+
+    /* Feedback section */
+    .feedback-container {
+        padding: 0 1rem;
+    }
+
+    /* Form elements */
+    input, textarea, button {
+        width: 100%;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .features-grid,
+    .testimonial-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Better text scaling */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.75rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 2.0rem !important;
+    }
+
+    p {
+        font-size: 0.9rem !important;
+    }
+
+    .cta-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+/* Mobile menu styles */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text);
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    .nav-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative; /* Make sure this is set */
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+        position: absolute;
+        left: 160px; /* Adjust this as needed */
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .menu.active {
+        display: flex;
+    }
+}
+/* Contact Section */
+.contact {
+    padding: 4rem 2rem;
+    background: white;
+}
+
+.contact-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    text-align: center;
+}
+
+.contact-item i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+.video-showcase {
+    padding: 6rem 2rem;
+    background: linear-gradient(to bottom, #f8fafc, #ffffff);
+}
+
+.video-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.video-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.video-header h2 {
+    font-size: 2.5rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.video-description {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.video-wrapper {
+    position: relative;
+    background: #000;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background: #000;
+}
+
+.main-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.play-button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.play-button i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-left: 5px;
+}
+
+.play-button:hover {
+    transform: scale(1.1);
+    background: white;
+}
+
+.video-features {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 0 0 20px 20px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text);
+}
+
+.feature i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.feature span {
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .video-showcase {
+        padding: 4rem 1rem;
+    }
+
+    .video-header h2 {
+        font-size: 2rem;
+    }
+
+    .video-features {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .play-button {
+        width: 60px;
+        height: 60px;
+    }
+
+    .play-button i {
+        font-size: 1.5rem;
+    }
+}
+  .styled-button {
+    display: none;
+    margin-top: 15px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .styled-button:hover {
+    background-color: #218838;
+  }
+  .hero-buttons {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.hero-btn {
+    position: relative;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Order Now Button Styles */
+.order-card {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: 1rem;
+            position: relative;
+        }
+.order-now {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    transform-style: preserve-3d;
+}
+
+.order-now .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.order-now .btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.order-now:hover .btn-icon {
+    transform: translateX(5px);
+}
+
+.order-now .btn-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 70%
+    );
+    transform: scale(0);
+    transition: transform 0.5s ease;
+}
+
+.order-now:hover .btn-glow {
+    transform: scale(1);
+}
+
+.order-now:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+}
+
+/* Login Button Styles */
+.login {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.login .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.login .ripple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0);
+    transition: transform 0.5s ease;
+    border-radius: 50px;
+}
+
+.login:hover .ripple {
+    transform: scale(1);
+}
+
+.login:hover {
+    border-color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .hero-btn {
+        width: 80%;
+        text-align: center;
+        padding: 0.7rem 1.5rem;
+    }
+}
+
+/* Adding pulse animation to Order Now button */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+    }
+}
+
+.order-now {
+    animation: pulse 2s infinite;
+}.section-title {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 30px;
+}
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <a href="" class="logo">
+                <i class="fas fa-leaf"></i>
+                <span>Nyika Nexus</span>
+            </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="menu">
+                <a href="#features">Features</a>
+                <a href="#statistics">Impact</a>
+                <a href="#contact">Contacts</a>
+                <a href="{% url 'order_service'%}">Place order</a>
+                <a href="#feedback">Feedback</a>
+                <a href="{%url 'login'%}">Login</a>
+
+            </div>
+
+        </div>
+        <!-- Add this to your nav -->
+
+    </nav>
+
+        <header>
+            <div class="hero-content">
+                <h1>Welcome to Nyika Nexus your farming solution</h1>
+            </div>
+        </header>
+
+    <section class="features scroll-reveal fade-bottom" id="features">
+        <div class="features-grid">
+            <div class="feature-card" onclick="showButton(event, this)">
+                <div class="feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h3>Fumigation</h3>
+                <p>Drone fumigation powered by AI ensures precise pesticide spraying, enabling early pest control and effective crop protection</p>
+               <button class="styled-button"  onclick="redirectToLogin(event)">Explore More</button>
+            </div>
+
+            <div class="feature-card" onclick="showButton(event, this)">
+                <div class="feature-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h3>Soil Health Analysis</h3>
+                <p>Precise soil pH monitoring and nutrient analysis to optimize crop growth and yield potential.</p>
+                <button class="styled-button" onclick="redirectToLogin(event)">Explore More</button>
+            </div>
+            <div class="feature-card" onclick="showButton(event, this)">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Data Analytics</h3>
+                <p>Comprehensive agricultural insights and actionable recommendations based on real-time field data analysis.</p>
+                <button class="styled-button" onclick="redirectToLogin(event)">Explore More</button>
+            </div>
+            <div class="feature-card" onclick="showButton(event, this)">
+              <div class="feature-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <h3>Mobile Integration</h3>
+              <p>Access real-time farm insights, reports, and expert recommendations. Socialize with other farmers by sharing posts and reporting challenges online through our farmer portal.</p>
+              <button class="styled-button" onclick="redirectToLogin(event)">Explore More</button>
+            </div>
+            <div class="feature-card" onclick="showButton(event, this)">
+                <div class="feature-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3>Sustainable Farming</h3>
+                <p>Promote environmentally conscious farming practices while maximizing crop yields and resource efficiency.</p>
+                <button class="styled-button" onclick="redirectToLogin(event)">Explore More</button>
+            </div>
+
+            <div class="feature-card" onclick="showButton(event, this)">
+                <div class="feature-icon">
+                    <i class="fas fa-cloud-sun"></i>
+                </div>
+                <h3>Weather Integration</h3>
+                <p>Smart weather monitoring and forecasting to help plan farming activities and protect crops effectively.</p>
+                <button class="styled-button" onclick="redirectToLogin(event)">Explore More</button>
+            </div>
+
+        </div>
+        <!-- Add these buttons inside your hero-content div -
+
+    <!-- Add this div for the buttons -->
+    <div class="hero-buttons">
+        <a href="{% url 'order_service' %}" class="hero-btn order-now">
+            <span class="btn-content">
+                <span class="btn-text">Order Now</span>
+                <span class="btn-icon">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+            </span>
+            <span class="btn-glow"></span>
+        </a>
+    </div>
+    </section>
+   <!-- HTML -->
+<section class="video-showcase">
+    <div class="video-content">
+        <div class="video-header">
+            <h2>See Our Expertise in Action</h2>
+            <p class="video-description">Watch our skilled team perform precise drone-based fumigation operations in the field.</p>
+        </div>
+
+        <div class="video-wrapper">
+            <div class="video-container">
+                <video id="showcase-video" class="main-video" poster="{% static 'images/video-thumbnail.jpg' %}" playsinline>
+                    <source src="{% static 'video/nyikaventure.mp4' %}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+
+                <!-- Custom Play Button Overlay -->
+                <div class="video-overlay" id="video-overlay">
+                    <button class="play-button">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Features -->
+            <div class="video-features">
+                <div class="feature">
+                    <i class="fas fa-drone"></i>
+                    <span>Advanced Drone Technology</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-leaf"></i>
+                    <span>Precision Fumigation</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Safety First Approach</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <section class="statistics" id="statistics">
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3 class="count" data-target="53">0</h3>
+                <p>Happy Customers</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="count" data-target="70">0</h3>
+                <p>Acres served</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="count" data-target="2">0</h3>
+                <p>Regions</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials scroll-reveal fade-bottom" id="testimonials">
+         <h2 class="section-title">What Our Users Say</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <img src="{% static 'images/user1.jpg' %}" alt="Alice Mwangi" class="testimonial-avatar">
+                <p class="testimonial-quote">"A groundbreaking solution for precision agriculture. Nyika Nexus is paving the way for sustainable farming."</p>
+                <p class="testimonial-author">Jackline Charles</p>
+                <span>Small-Scale Farmer</span>
+            </div>
+             <div class="testimonial-card">
+                <img src="{% static 'images/ronaldo.png' %}" alt="ronaldo" class="testimonial-avatar">
+                <p class="testimonial-quote">"Nyika Nexus has transformed our farming practices. The drone technology makes soil analysis and pest control so efficient!"</p>
+                <p class="testimonial-author">Neema Sengo</p>
+                <span>Small-Scale Farmer</span>
+            </div>
+            <div class="order-card">
+             <p class="testimonial-quote">"Think this is all we've got? Not even close. We're just getting started! Create an account now to unlock groundbreaking content that will revolutionize your perspective on agriculture. Innovation, connection, and growth await inside."</p>
+        <div class="hero-buttons">
+            <a href="{% url 'login' %}" class="hero-btn order-now">
+            <span class="btn-content">
+                <span class="btn-text">login now</span>
+                <span class="btn-icon">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+
+            </span>
+            <span class="btn-glow"></span>
+        </a>
+    </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- Add FAQ Section -->
+     <section class="faq scroll-reveal fade-bottom" id="faq">
+        <div class="faq-container">
+            <h2 style="text-align: center; margin-bottom: 3rem;">Frequently Asked Questions</h2>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>What is Nyika Nexus?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Nyika Nexus is an agritech solution developed by Nyika Venture. It leverages drone technology equipped with advanced sensors to transform agriculture, helping farmers analyze soil health, control pests, and enhance productivity.</p>
+                </div>
+            </div>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>What technologies does Nyika Nexus use?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Nyika Nexus employs drone technology with sensors capable of performing and conducting targeted pest control fumigation, analyzing soil pH and managing acidity levels.</p>
+                </div>
+            </div>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>How does Nyika Nexus benefit farmers?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                   <p>Nyika Nexus empowers farmers with real-time data on soil conditions and pest management, enabling smarter crop decisions and sustainable practices. Through advanced technologies and a vibrant farmer portal, it drives better yields, fosters knowledge sharing, and transforms agricultural efficiency.</p>
+                </div>
+            </div>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>Is Nyika Nexus suitable for all types of crops?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, Nyika Nexus is essential to all types of farming by providing customized soil analysis and smart fumigation, making it adaptable and important to every type of agricultural setups.</p>
+                </div>
+            </div>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>How can I get started with Nyika Nexus?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>To get started,click menu then login directly to the farmer portal designed to support farmers in different aspects or visit our social media platforms to learn more about services and solutions.</p>
+                </div>
+            </div>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>How does Nyika Nexus ensure sustainability?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Nyika Nexus promotes sustainable farming by minimizing farmers chemical exposure due to using drones in furmigation and through soil Ph analysis ensures optimized soil health for better production and doing all of this it reducing healthy problems to all farmers.</p>
+                </div>
+            </div>
+
+            <div class="faq-item scroll-reveal fade-left">
+                <div class="faq-question">
+                    <span>Where can I find more information about Nyika Nexus?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>You can follow Nyika Venture on their Instagram page or reach out via their contact details but also by login in in the farmers portal you will see alot of content that is yet to be discoverd</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2 style="font-size: 2rem; margin-bottom: 20px; text-align:center; ">Contact us</h2>
+        <div class="contact-grid">
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <h3>Phone</h3>
+                <a href="tel:0742356679" style="font-size: 1rem; text-decoration: none; color: inherit;"><p style="font-size: 1rem;">+255 742356679</p></a>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <h3>Email</h3>
+                <a href="mailto:info@nyikaventures.co.tz" style="font-size: 1rem; text-decoration: none; color: inherit;"><p style="font-size: 1rem;">info@nyikaventures.co.tz</p></a>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>Location</h3>
+                <p>Geita, Tanzania</p>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="feedback scroll-reveal fade-bottom" id="feedback">
+        <div class="feedback-container">
+            <h2 style="text-align: center; margin-bottom: 3rem;">Share Your Thoughts</h2>
+            <form class="scroll-reveal fade-bottom" method="POST" action="">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea  name="message" placeholder="Your Message" rows="5" required></textarea>
+                <button type="submit">Send Feedback</button>
+            </form>
+        </div>
+    </section>
+    <footer>
+        <div class="footer-content">
+            <div class="social-icons">
+                <a href="https://www.instagram.com/nyikaventure_?igsh=dHp2ZnV5cWVqMnlq " class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/in/nyika-venture-5b5715285?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app " class="social-icon"><i class="fab fa-linkedin"></i></a>
+                <a href="mailto:emmanuelcharles362@gmail.com" class="social-icon"><i class="fab fa-google"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="https://x.com/nyikaventure?s=09" class="social-icon"><i class="fab fa-twitter"></i></a>
+            </div>
+            <p>&copy; 2025 Nexus. All rights reserved.</p>
+        </div>
+    </footer>
+    <button id="scrollToTopBtn">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.hero-btn');
+
+    buttons.forEach(button => {
+        button.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.classList.add('active');
+        });
+
+        button.addEventListener('touchend', function() {
+            this.classList.remove('active');
+        });
+    });
+});
+     // Show button when the card is clicked
+          function showButton(event, card) {
+            event.stopPropagation();
+            const button = card.querySelector('.styled-button');
+            button.style.display = 'block';
+          }
+
+          // Hide button when clicking outside the card
+          document.addEventListener('click', function () {
+            const buttons = document.querySelectorAll('.styled-button');
+            buttons.forEach(button => button.style.display = 'none');
+          });
+          function redirectToLogin(event) {
+            window.location.href = '/login'; // Update with your login URL
+          }
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('showcase-video');
+            const overlay = document.getElementById('video-overlay');
+            const playButton = overlay.querySelector('.play-button');
+
+            // Play/Pause functionality
+            overlay.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    overlay.style.opacity = '0';
+                } else {
+                    video.pause();
+                    overlay.style.opacity = '1';
+                }
+            });
+
+            // Show overlay when video is paused
+            video.addEventListener('pause', () => {
+                overlay.style.opacity = '1';
+            });
+
+            // Hide overlay when video is playing
+            video.addEventListener('play', () => {
+                overlay.style.opacity = '0';
+            });
+
+            // Show overlay on video end
+            video.addEventListener('ended', () => {
+                overlay.style.opacity = '1';
+            });
+
+            // Hover effect on play button
+            playButton.addEventListener('mouseenter', () => {
+                playButton.style.transform = 'scale(1.1)';
+            });
+
+            playButton.addEventListener('mouseleave', () => {
+                playButton.style.transform = 'scale(1)';
+            });
+        });
+        // Toggle the mobile menu when the button is clicked
+document.querySelector('.mobile-menu-toggle').addEventListener('click', () => {
+    document.querySelector('.menu').classList.toggle('active');
+});
+
+// Close the menu when clicking outside of it
+document.addEventListener('click', (event) => {
+    const menu = document.querySelector('.menu');
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+
+    if (!menu.contains(event.target) && !menuToggle.contains(event.target)) {
+        menu.classList.remove('active');
+    }
+});
+
+        // Scroll reveal animation
+        function handleScrollReveal() {
+            const reveals = document.querySelectorAll('.scroll-reveal');
+            reveals.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                const windowHeight = window.innerHeight;
+
+                // Show element when it enters the viewport
+                if (elementTop < windowHeight - 50 && elementBottom > 0) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // Initialize scroll reveal
+        window.addEventListener('scroll', handleScrollReveal);
+        window.addEventListener('load', handleScrollReveal);
+
+        // FAQ functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isActive = item.classList.contains('active');
+
+                // Close all FAQ items
+                document.querySelectorAll('.faq-item').forEach(faqItem => {
+                    faqItem.classList.remove('active');
+                });
+
+                // Open clicked item if it wasn't active
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+        // Count animation
+        const counters = document.querySelectorAll('.count');
+        const options = { threshold: 0.5 };
+
+        const countUp = (counter) => {
+            const target = +counter.getAttribute('data-target');
+            const speed = 200;
+            const increment = Math.ceil(target / speed);
+            let current = 0;
+
+            const updateCount = () => {
+                if (current < target) {
+                    current += increment;
+                    counter.textContent = current;
+                    requestAnimationFrame(updateCount);
+                } else {
+                    counter.textContent = target;
+                }
+            };
+            updateCount();
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    countUp(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, options);
+
+        counters.forEach(counter => observer.observe(counter));
+
+        // Scroll to top button
+        const scrollBtn = document.getElementById('scrollToTopBtn');
+
+        window.onscroll = () => {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = 'flex';
+            } else {
+                scrollBtn.style.display = 'none';
+            }
+        };
+
+        scrollBtn.onclick = () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      background: linear-gradient(-45deg, #ee7752,#2A5A3B,rgb(9, 91, 121), #23d5ab);
+      background-size: 400% 400%;
+      animation: gradient 25s ease infinite;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 450px;
+      margin: auto;
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.5s ease;
+      width: 100%;
+    }
+
+    /* Mobile-first padding approach */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 1.5rem;
+        border-radius: 1rem;
+      }
+
+      .login-header h1 {
+        font-size: 1.5rem !important;
+      }
+
+      .login-header p {
+        font-size: 0.875rem !important;
+      }
+
+      .input-group input {
+        padding: 0.75rem !important;
+      }
+
+      .social-login {
+        grid-template-columns: 1fr !important;
+      }
+      .social-button1{
+        display: none;
+      }
+    }
+
+    /* Tablet size */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .login-card {
+        padding: 2rem;
+        border-radius: 1.25rem;
+      }
+      .social-button1{
+        display: none;
+      }
+    }
+
+    /* Desktop size */
+    @media (min-width: 769px) {
+      .login-card {
+        padding: 3rem;
+        border-radius: 1.5rem;
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h1 {
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-header p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      color: white;
+      transition: all 0.5s;
+    }
+
+    .input-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .checkbox-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.875rem;
+    }
+
+    .forgot-password {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.875rem;
+      text-decoration: none;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 0.875rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.5s;
+      margin-bottom: 1.25rem;
+    }
+
+    .login-button:hover {
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1.25rem 0;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.875rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .divider span {
+      padding: 0 1rem;
+    }
+
+    .social-login {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .social-button {
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.75rem;
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.5s;
+    }
+
+    .social-button:hover {
+      background: rgba(109, 85, 197, 0.82);
+      transform: translateY(-2px);
+    }
+    .social-button1 {
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.75rem;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.5s;
+      }
+
+      .social-button1:hover {
+        background: rgba(109, 85, 197, 0.82);
+        transform: translateY(-2px);
+      }
+
+    .login-footer {
+      text-align: center;
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .login-footer a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* Additional mobile optimizations */
+    @media (max-width: 360px) {
+      .login-container {
+        padding: 0.75rem;
+      }
+
+      .login-card {
+        padding: 1.25rem;
+      }
+
+      .checkbox-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .login-button {
+        padding: 0.75rem;
+      }
+    }
+
+    .messages {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .message-error {
+        background: rgba(255, 59, 48, 0.2);
+    }
+
+    .message-success {
+        background: rgba(52, 199, 89, 0.2);
+    }
+  .show-password {
+    display: flex;
+    align-items: center;
+    color: #fff; /* White text color */
+    font-size: 16px;
+    cursor: pointer;
+  }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>Welcome Back</h1>
+        <p>Enter your credentials to access your account</p>
+      </div>
+      {% if messages %}
+      {% for message in messages %}
+          <div class="messages message-{{ message.tags }}">
+              {{ message }}
+          </div>
+      {% endfor %}
+  {% endif %}
+     <form method="POST" action="">
+        {% csrf_token %}
+  <div class="input-group">
+    <label for="email">Username/Email</label>
+    <input type="text" id="name" name="username" placeholder="name@example.com" required>
+  </div>
+
+  <div class="input-group">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+  </div>
+
+  <div class="checkbox-group">
+    <label class="show-password">
+      <input type="checkbox" id="togglePassword">
+      <span>Show password</span>
+    </label>
+    <a href="#" class="forgot-password">Forgot password?</a>
+  </div>
+
+  <button type="submit" class="login-button">Sign in</button>
+</form>
+
+<!-- JavaScript to toggle password visibility -->
+<script>
+  document.getElementById('togglePassword').addEventListener('change', function() {
+    var passwordField = document.getElementById('password');
+    if (this.checked) {
+      passwordField.type = 'text';
+    } else {
+      passwordField.type = 'password';
+    }
+  });
+</script>
+
+
+      <div class="divider">
+        <span>or continue with</span>
+      </div>
+
+      <div class="social-login">
+        <button class="social-button">Google</button>
+        <button class="social-button">Apple</button>
+        <button class="social-button1">GitHub</button>
+      </div>
+
+      <div class="login-footer">
+        <p>Don't have an account? <a href="{% url 'signin'%}"><button class="social-button">create account</button></a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

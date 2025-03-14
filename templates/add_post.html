@@ -1,0 +1,118 @@
+{% extends base_template %}
+{% block extra_css %}
+<style>
+/* General body styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* Style for the form container */
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for each form field */
+form input, form textarea, form button {
+    width: 100%;
+    padding: 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Style for the submit button */
+form button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 20px;
+    border-radius: 6px;
+}
+
+/* Hover effect for the submit button */
+form button:hover {
+    background-color: #45a049;
+}
+
+/* Style for form headings */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Add some space between the form fields */
+form input, form textarea {
+    margin-bottom: 20px;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    /* Adjust the form container for mobile screens */
+    form {
+        max-width: 100%;
+        padding: 30px;
+    }
+
+    /* Adjust heading size */
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Adjust input and button padding for smaller screens */
+    form input, form textarea, form button {
+        padding: 10px;
+    }
+
+    /* Make button font size smaller on mobile */
+    form button {
+        font-size: 14px;
+    }
+    footer {
+        display: none;
+}
+
+/* Further optimization for extra small screens */
+@media (max-width: 480px) {
+    form {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    form input, form textarea, form button {
+        padding: 8px;
+    }
+
+    form button {
+        font-size: 14px;
+    }
+}
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+  <form method="POST" enctype="multipart/form-data">
+    <h1 data-en="New Post" data-sw="Chapisho jipya">New Post</h1>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button
+      type="submit"
+      data-en="Create Post"
+      data-sw="Chapisha">
+      Create Post<i class="far fa-paper-plane"></i>
+    </button>
+  </form>
+{% endblock %}
+

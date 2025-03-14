@@ -1,0 +1,337 @@
+{% extends base_template %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a73e8;
+        --secondary-color: #f8f9fa;
+        --text-primary: #2c3e50;
+        --text-secondary: #636e72;
+        --border-radius: 16px;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: #f8f9fa;
+        color: var(--text-primary);
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Modern Profile Header */
+    .profile-header {
+        background: linear-gradient(135deg, #fff, var(--secondary-color));
+        border-radius: var(--border-radius);
+        padding: 40px 20px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .profile-picture-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .profile-picture {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+    }
+
+    .profile-picture:hover {
+        transform: scale(1.05);
+    }
+
+    .change-picture-btn {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(4px);
+        border: none;
+        cursor: pointer;
+    }
+
+    .profile-picture-container:hover .change-picture-btn {
+        opacity: 1;
+    }
+
+    .profile-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 10px 0;
+        color: var(--text-primary);
+    }
+
+    .profile-header p {
+        font-size: 16px;
+        color: var(--text-secondary);
+        margin: 5px 0;
+    }
+
+    /* Modern Action Buttons */
+    .profile-actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 30px 0;
+        padding: 0 15px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        background: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        color: var(--text-primary);
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 160px;
+        justify-content: center;
+        flex: 0 1 auto;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: var(--primary-color);
+        color: #fff;
+    }
+
+    .action-btn i {
+        font-size: 18px;
+    }
+
+    /* Modern Posts Grid */
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 40px;
+        padding: 0 15px;
+    }
+
+    .post-card {
+        background: #fff;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .post-media {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+    }
+
+    .post-content {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+    }
+
+    .post-caption {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--text-secondary);
+        font-size: 13px;
+        margin-top: auto;
+    }
+
+    .no-posts {
+        text-align: center;
+        padding: 40px;
+        background: #fff;
+        border-radius: var(--border-radius);
+        color: var(--text-secondary);
+        margin: 20px 15px;
+    }
+
+    .section-title {
+        margin: 40px 15px 20px;
+        font-size: 24px;
+        color: var(--text-primary);
+    }
+
+    /* Enhanced Responsive Design */
+    @media screen and (max-width: 1024px) {
+        .posts-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .container {
+            width: 95%;
+            padding: 10px;
+        }
+
+        .profile-actions {
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            min-width: 140px;
+            font-size: 14px;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-header h2 {
+            font-size: 20px;
+        }
+
+        .profile-header p {
+            font-size: 14px;
+        }
+
+        .action-btn {
+            min-width: 120px;
+            padding: 8px 16px;
+        }
+
+        .posts-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .post-title {
+            font-size: 16px;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="container">
+    <!-- Modern Profile Header -->
+    <div class="profile-header">
+        <div class="profile-picture-container">
+            {% load static %}
+            <img src="{% static 'images/default-profile.jpg' %}" alt="Profile Picture" class="profile-picture">
+            <button class="change-picture-btn">
+                <i class="fas fa-camera"></i> Change Picture
+            </button>
+        </div>
+        <h2>{{ user.username }}</h2>
+        <p>{{ user.email }}</p>
+    </div>
+
+    <!-- Modern Action Buttons - Now Horizontal -->
+    <div class="profile-actions">
+        <button class="action-btn" onclick="location.href='{% url 'change_password'%}'">
+            <i class="fas fa-lock"></i> Password
+        </button>
+        <button class="action-btn" onclick="location.href='{% url 'setting'%}'">
+            <i class="fas fa-user-edit"></i> Profile
+        </button>
+        <button class="action-btn" onclick="location.href='{% url 'setting'%}'">
+            <i class="fas fa-clipboard-list"></i> Registration
+        </button>
+    </div>
+
+    <!-- Modern Posts Section -->
+    <h3 class="section-title">Your Posts</h3>
+    {% if user_posts %}
+    <div class="posts-grid">
+        {% for post in user_posts %}
+        <div class="post-card">
+
+            {% load custom_filters %}
+            {% comment %} z {% endcomment %}
+            {% if post.media %}
+                {% if post.media.url|ends_with:".mp4" %}
+                <video controls class="post-media">
+                    <source src="{{ post.media.url }}" type="video/mp4">
+                    Your browser does not support video playback.
+                </video>
+                {% else %}
+                <img src="{{ post.media.url }}" alt="{{ post.title }}" class="post-media" onclick="location.href='{% url 'post_detail' post.id %}'">
+                {% endif %}
+            {% endif %}
+            <div class="post-content" >
+                <h5 class="post-title">{{ post.title }}</h5>
+                <p class="post-caption" onclick="location.href='{% url 'post_detail' post.id %}'">{{ post.caption|truncatechars:150 }}</p>
+                <div class="post-meta">
+                    <span><i class="far fa-calendar"></i> {{ post.date_created|date:"M d, Y" }}</span>
+                </div>
+                <form action="{% url 'delete_post' post.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn" style="background-color: red; color: white;">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-posts">
+        <i class="far fa-image fa-3x mb-3"></i>
+        <p>You haven't shared any posts yet. Start sharing your moments!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

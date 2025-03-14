@@ -1,0 +1,719 @@
+{% extends base_template %}
+{% block extra_css %}
+<style>
+    /* ... (keep your existing CSS) ... */
+
+    /* Add styles for share modal */
+    .share-modal {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 20px;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-out;
+    }
+
+    .share-modal.active {
+        display: block;
+        transform: translateY(0);
+    }
+
+    .share-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .share-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: #333;
+        padding: 10px;
+        border-radius: 10px;
+        transition: background-color 0.2s;
+    }
+
+    .share-option:hover {
+        background-color: #f0f0f0;
+    }
+
+    .share-option i {
+        font-size: 24px;
+    }
+
+    .share-option span {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .modal-overlay.active {
+        display: block;
+    }
+
+    .close-modal {
+        width: 40px;
+        height: 4px;
+        background: #ddd;
+        border-radius: 2px;
+        margin: 0 auto 20px;
+    }
+    .posts-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 0 1rem;
+        background: #f7f3e9;
+    }
+
+    /* Post Card */
+    .post-card {
+        background: #fff7f2;
+        border-radius: 12px;
+        box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.12);
+        transition: transform 0.3s ease;
+        margin-bottom: 24px;
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Post Header */
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid #dde0e0;
+    }
+
+    .post-user {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #ff8e8e;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-avatar i {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        color: #ff8e8e;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+        color: #333;
+    }
+
+    .post-location {
+        font-size: 0.85rem;
+        color: #777;
+    }
+
+    .post-menu {
+        background: none;
+        border: none;
+        color: #777;
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    /* Post Media */
+    .post-media {
+        width: 100%;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-bottom: 1px solid #dde0e0;
+    }
+
+    .post-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0 0 12px 12px;
+    }
+
+    /* Post Actions */
+    .post-actions {
+        display: flex;
+        justify-content: space-between;
+        padding: 14px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 20px;
+    }
+
+    .action-btn {
+        background: none;
+        border: none;
+        color: #ff8e8e;
+        cursor: pointer;
+        padding: 8px;
+        font-size: 1.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .action-btn:hover {
+        color: #e23939;
+    }
+
+    .like-btn.active {
+        color: #e23939;
+    }
+
+    .save-btn.active {
+        color: #007cba;
+    }
+
+    /* Post Content */
+    .post-content {
+        padding: 0 16px;
+    }
+
+    .post-likes {
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .post-caption {
+        margin-bottom: 8px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .post-time {
+        font-size: 0.85rem;
+        color: #777;
+        margin-top: 8px;
+    }
+
+    .view-comments {
+        background: none;
+        border: none;
+        color: #007cba;
+        cursor: pointer;
+        padding: 0;
+        font-size: 1rem;
+    }
+
+    /* Comment Input */
+    .post-comment-input {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border-top: 1px solid #dde0e0;
+        gap: 12px;
+    }
+
+    .post-comment-input input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 8px 0;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+    .emoji-btn {
+        background: none;
+        border: none;
+        color: #ff8e8e;
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+
+    .post-btn {
+        background: none;
+        border: none;
+        color: #007cba;
+        font-weight: 600;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .post-btn:hover {
+        color: #004f75;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+        .posts-container {
+            margin: 0;
+            padding: 0;
+        }
+
+        .post-card {
+            border-radius: 0;
+            margin-bottom: 16px;
+        }
+    }
+    <>
+        /* Container to center the video and add padding */
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f9f9f9; /* Light background for contrast */
+            border-radius: 10px; /* Rounded edges */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        /* Style for the video itself */
+        .video-container video {
+            max-width: 100%; /* Responsive: Takes up the available width */
+            height: auto; /* Adjust height proportionally */
+            border-radius: 8px; /* Rounded corners for the video */
+            border: 2px solid #ddd; /* Subtle border */
+            object-fit: cover; /* Ensures video fills the frame nicely */
+        }
+
+        /* Add a hover effect on the video */
+        .video-container video:hover {
+            transform: scale(1.02); /* Slight zoom on hover */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+        }
+
+        /* Optional: Add caption styling */
+        .video-caption {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+        }
+        .posts-container { max-width: 900px; /* You can adjust this value to fit your desired width */
+            margin-left: 0px; }
+         @media (max-width: 768px) {
+            .container { width: 100%; }
+         }
+
+    /* Add styles for share modal */
+    .share-modal {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 20px;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-out;
+    }
+
+    .share-modal.active {
+        display: block;
+        transform: translateY(0);
+    }
+
+    .share-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .share-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: #333;
+        padding: 10px;
+        border-radius: 10px;
+        transition: background-color 0.2s;
+    }
+
+    .share-option:hover {
+        background-color: #f0f0f0;
+    }
+
+    .share-option i {
+        font-size: 24px;
+    }
+
+    .share-option span {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .modal-overlay.active {
+        display: block;
+    }
+
+    .close-modal {
+        width: 40px;
+        height: 4px;
+        background: #ddd;
+        border-radius: 2px;
+        margin: 0 auto 20px;
+    }
+    .like-btn.active {
+        color: #e23939;
+    }
+
+    .like-btn.active i {
+        color: #e23939;
+    }
+
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+// Function to toggle comments visibility
+function toggleComments(postId) {
+    const commentsSection = document.getElementById(`comments-${postId}`);
+    if (commentsSection.style.display === 'none') {
+        commentsSection.style.display = 'block';
+    } else {
+        commentsSection.style.display = 'none';
+    }
+}
+
+// Function to toggle like status
+async function toggleLike(postId, likeButton) {
+    try {
+        const response = await fetch(`/api/posts/${postId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            // Update like count
+            const likesElement = likeButton.closest('.post-card').querySelector('.post-likes');
+            likesElement.textContent = `${data.likes_count} likes`;
+
+            // Toggle like button appearance
+            const icon = likeButton.querySelector('i');
+            icon.classList.toggle('fas');
+            icon.classList.toggle('far');
+            likeButton.classList.toggle('active');
+        }
+    } catch (error) {
+        console.error('Error toggling like:', error);
+    }
+}
+
+// Function to toggle save status
+function toggleSave(saveButton) {
+    const icon = saveButton.querySelector('i');
+    icon.classList.toggle('fas');
+    icon.classList.toggle('far');
+    saveButton.classList.toggle('active');
+}
+
+// Function to handle comment input
+function handleCommentInput(input) {
+    const postBtn = input.parentElement.querySelector('.post-btn');
+    postBtn.style.opacity = input.value.length > 0 ? '1' : '0.5';
+}
+
+// Function to open share modal
+function sharePost(postId) {
+    const modal = document.getElementById(`shareModal-${postId}`);
+    const overlay = document.getElementById('modalOverlay');
+    modal.classList.add('active');
+    overlay.classList.add('active');
+}
+
+// Function to close share modal
+function closeShareModal() {
+    const activeModal = document.querySelector('.share-modal.active');
+    const overlay = document.getElementById('modalOverlay');
+    if (activeModal) {
+        activeModal.classList.remove('active');
+        overlay.classList.remove('active');
+    }
+}
+
+// Function to share via specific platform
+function shareVia(platform, postUrl, title) {
+    const urls = {
+        whatsapp: `whatsapp://send?text=${encodeURIComponent(title + ' ' + postUrl)}`,
+        telegram: `https://t.me/share/url?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(title)}`,
+        twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(postUrl)}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`,
+        email: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(postUrl)}`,
+    };
+
+    if (urls[platform]) {
+        window.open(urls[platform], '_blank');
+    } else if (platform === 'copy') {
+        navigator.clipboard.writeText(postUrl).then(() => {
+            alert('Link copied to clipboard!');
+        });
+    }
+    closeShareModal();
+}
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function () {
+    // Like button handlers
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const postId = this.closest('.post-card').dataset.postId;
+            toggleLike(postId, this);
+        });
+    });
+
+    // Save button handlers
+    document.querySelectorAll('.save-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            toggleSave(this);
+        });
+    });
+
+    // Comment input handlers
+    document.querySelectorAll('.post-comment-input input').forEach(input => {
+        input.addEventListener('input', function () {
+            handleCommentInput(this);
+        });
+    });
+
+    // Share modal overlay handler
+    document.getElementById('modalOverlay').addEventListener('click', closeShareModal);
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="posts-container">
+    {% for post in posts %}
+    <div class="post-card" data-post-id="{{ post.id }}">
+        <!-- ... (keep existing post header and media sections) ... -->
+ <!-- Post Header -->
+ <div class="post-header">
+    <div class="post-user">
+        <div class="user-avatar">
+            {% if post.farmer.profile_picture %}
+                <img src="{{ post.farmer.profile_picture.url }}" alt="{{ post.farmer.username }}">
+            {% else %}
+                <i class="fas fa-user-circle"></i>
+            {% endif %}
+        </div>
+        <div class="user-info">
+            <strong>{{ post.farmer.username }}</strong>
+            <span class="post-location">Nyika farm</span>
+        </div>
+    </div>
+    <button class="post-menu">
+        <i class="fas fa-ellipsis-h"></i>
+    </button>
+</div>
+
+<!-- Post Media -->
+<div class="post-media">
+<div class="post-media">
+<div class="post-media">
+{% load custom_filters %}
+
+{% if post.media %}
+{% if post.media.url|ends_with:".mp4" %}
+<!-- Display MP4 video -->
+<video controls width="100%">
+    <source src="{{ post.media.url }}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+{% elif post.media.url|ends_with:".webm" %}
+<!-- Display WebM video -->
+<video controls width="100%">
+    <source src="{{ post.media.url }}" type="video/webm">
+    Your browser does not support the video tag.
+</video>
+{% elif post.media.url|ends_with:".ogg" %}
+<!-- Display OGG video -->
+<video controls width="100%">
+    <source src="{{ post.media.url }}" type="video/ogg">
+    Your browser does not support the video tag.
+</video>
+
+{% else %}
+<img src="{{ post.media.url }}" alt="{{ post.title }}">
+{% endif %}
+{% endif %}
+</div>
+</div>
+</div>
+        <!-- Post Actions -->
+        <div class="post-actions">
+            <div class="action-buttons">
+                <button class="action-btn like-btn" title="Like">
+                    <i class="{% if post.is_liked %}fas{% else %}far{% endif %} fa-heart"></i>
+                </button>
+                <button class="action-btn comment-btn" title="Comment">
+                    <i class="far fa-comment"></i>
+                </button>
+                <button class="action-btn share-btn" title="Share" onclick="sharePost({{ post.id }})">
+                    <i class="far fa-paper-plane"></i>
+                </button>
+            </div>
+            <button class="action-btn save-btn" title="Save">
+                <i class="far fa-bookmark"></i>
+            </button>
+        </div>
+
+        <!-- ... (keep existing post content and comment sections) ... -->
+
+        <!-- Post Content -->
+        <div class="post-content">
+            <div class="post-likes">
+                {{ post.like_count }} likes
+            </div>
+            <div class="post-caption">
+                <strong>{{ post.farmer.username }}</strong>
+                {{ post.caption }}
+            </div>
+            <div class="post-comments">
+                <button class="view-comments" onclick="toggleComments({{ post.id }})">
+    <span data-en="View all comments ({{ post.comment_count }})"  data-sw="Tazama maoni yote ({{ post.comment_count }})">
+        View all comments ({{ post.comment_count }})
+    </span>
+</button>
+                <div id="comments-{{ post.id }}" class="comments-section" style="display:none;">
+                    {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <strong>{{ comment.author.username }}</strong>: {{ comment.comment }}
+                    </div>
+                    {% empty %}
+                    <p>No comments yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="post-time">
+                {{ post.date_created|timesince }} ago
+            </div>
+        </div>
+
+        <!-- Comment Input -->
+        <div class="post-comment-input">
+            <form method="POST" action="{% url 'post' %}">
+                {% csrf_token %}
+                <button type="button" class="emoji-btn">
+                    <i class="far fa-smile"></i>
+                </button>
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <input type="text" name="comment" placeholder="Ongeza maoni...." required data-en="Add a comment...." data-sw="Ongeza maoni....">
+
+                <button type="submit" class="post-btn">Post</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Share Modal for each post -->
+    <div id="shareModal-{{ post.id }}" class="share-modal">
+        <div class="close-modal"></div>
+        <h3>Share Post</h3>
+        <div class="share-options">
+            <a href="#" class="share-option" onclick="shareVia('whatsapp', '{{ request.build_absolute_uri }}{% url 'post_detail' post.id %}', '{{ post.caption|truncatechars:50|escapejs }}')">
+                <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+                <span>WhatsApp</span>
+            </a>
+            <a href="#" class="share-option" onclick="shareVia('telegram', '{{ request.build_absolute_uri }}{% url 'post_detail' post.id %}', '{{ post.caption|truncatechars:50|escapejs }}')">
+                <i class="fab fa-telegram" style="color: #0088cc;"></i>
+                <span>Telegram</span>
+            </a>
+            <a href="#" class="share-option" onclick="shareVia('twitter', '{{ request.build_absolute_uri }}{% url 'post_detail' post.id %}', '{{ post.caption|truncatechars:50|escapejs }}')">
+                <i class="fab fa-twitter" style="color: #1DA1F2;"></i>
+                <span>Twitter</span>
+            </a>
+            <a href="#" class="share-option" onclick="shareVia('facebook', '{{ request.build_absolute_uri }}{% url 'post_detail' post.id %}', '{{ post.caption|truncatechars:50|escapejs }}')">
+                <i class="fab fa-facebook" style="color: #4267B2;"></i>
+                <span>Facebook</span>
+            </a>
+            <a href="#" class="share-option" onclick="shareVia('email', '{{ request.build_absolute_uri }}{% url 'post_detail' post.id %}', '{{ post.caption|truncatechars:50|escapejs }}')">
+                <i class="far fa-envelope" style="color: #333;"></i>
+                <span>Email</span>
+            </a>
+            <a href="#" class="share-option" onclick="shareVia('copy', '{{ request.build_absolute_uri }}{% url 'post_detail' post.id %}', '{{ post.caption|truncatechars:50|escapejs }}')">
+                <i class="far fa-copy" style="color: #333;"></i>
+                <span>Copy Link</span>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal Overlay -->
+<div id="modalOverlay" class="modal-overlay"></div>
+{% endblock %}
