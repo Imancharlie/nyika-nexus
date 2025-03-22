@@ -1,121 +1,92 @@
 
-import { CalendarDays, Clock, MapPin, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar, CheckCircle2, Clock, LucideIcon } from "lucide-react";
 
-interface ServiceCardProps {
+export interface ServiceCardProps {
   id: string;
   title: string;
   description: string;
-  type: "soil_analysis" | "fumigation";
-  status: "requested" | "in_progress" | "completed";
   date: string;
-  location?: string;
-  onClick?: () => void;
+  status: "pending" | "in-progress" | "completed";
+  onViewDetails?: () => void;
 }
+
+// Helper function to determine badge details based on status
+const getStatusDetails = (status: ServiceCardProps["status"]) => {
+  switch (status) {
+    case "pending":
+      return {
+        label: "Pending",
+        variant: "secondary" as const,
+        icon: Clock,
+      };
+    case "in-progress":
+      return {
+        label: "In Progress",
+        variant: "secondary" as const,
+        icon: Calendar,
+      };
+    case "completed":
+      return {
+        label: "Completed",
+        variant: "default" as const,
+        icon: CheckCircle2,
+      };
+    default:
+      return {
+        label: "Unknown",
+        variant: "outline" as const,
+        icon: Clock,
+      };
+  }
+};
 
 export default function ServiceCard({
   id,
   title,
   description,
-  type,
-  status,
   date,
-  location,
-  onClick,
+  status,
+  onViewDetails,
 }: ServiceCardProps) {
-  // Status badge color
-  const getBadgeVariant = () => {
-    switch (status) {
-      case "requested":
-        return "secondary";
-      case "in_progress":
-        return "warning";
-      case "completed":
-        return "default";
-      default:
-        return "secondary";
-    }
-  };
-
-  // Status badge text
-  const getStatusText = () => {
-    switch (status) {
-      case "requested":
-        return "Requested";
-      case "in_progress":
-        return "In Progress";
-      case "completed":
-        return "Completed";
-      default:
-        return "Unknown";
-    }
-  };
-
-  // Service type text
-  const getServiceTypeText = () => {
-    switch (type) {
-      case "soil_analysis":
-        return "Soil Analysis";
-      case "fumigation":
-        return "Fumigation Service";
-      default:
-        return "Service";
-    }
-  };
+  const statusDetails = getStatusDetails(status);
+  const StatusIcon = statusDetails.icon;
 
   return (
-    <Card className={cn(
-      "overflow-hidden transition-all duration-300 hover:shadow-md",
-      status === "completed" ? "bg-primary/5" : ""
-    )}>
-      <CardHeader className="p-4 pb-2">
+    <Card className="w-full transition-all duration-300 hover:shadow-md hover:border-primary/20">
+      <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <div>
-            <Badge variant={type === "soil_analysis" ? "outline" : "secondary"} className="mb-2">
-              {getServiceTypeText()}
-            </Badge>
-            <CardTitle className="text-lg">{title}</CardTitle>
-          </div>
-          <Badge variant={getBadgeVariant()}>
-            {getStatusText()}
+          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
+          <Badge variant={statusDetails.variant} className="ml-2">
+            <StatusIcon className="h-3.5 w-3.5 mr-1" />
+            {statusDetails.label}
           </Badge>
         </div>
+        <CardDescription className="text-sm text-muted-foreground">
+          Requested on {date}
+        </CardDescription>
       </CardHeader>
-      
-      <CardContent className="p-4 pt-2">
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-          {description}
-        </p>
-        
-        <div className="flex flex-col gap-2 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <CalendarDays className="h-4 w-4" />
-            <span>{date}</span>
-          </div>
-          
-          {status === "in_progress" && (
-            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-              <Clock className="h-4 w-4" />
-              <span>Estimated completion: 2 days</span>
-            </div>
-          )}
-          
-          {location && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{location}</span>
-            </div>
-          )}
-        </div>
+      <CardContent>
+        <p className="text-sm text-foreground/80">{description}</p>
       </CardContent>
-      
-      <CardFooter className="p-4 pt-0 justify-end">
-        <Button variant="ghost" size="sm" onClick={onClick} className="gap-1 hover:gap-2 transition-all">
-          View details
-          <ChevronRight className="h-4 w-4" />
+      <CardFooter>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full"
+          onClick={onViewDetails}
+        >
+          View Details
         </Button>
       </CardFooter>
     </Card>
