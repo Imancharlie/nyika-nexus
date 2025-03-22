@@ -1,100 +1,101 @@
-
-import React, { useEffect, useState } from "react";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { X } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const InstallPrompt = () => {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+export default function InstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
+    // Check if running on iOS
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+
+    // For iOS devices, show the prompt immediately
+    if (isIOSDevice) {
+      setIsVisible(true);
+      return;
+    }
+
+    const handler = (e: Event) => {
       e.preventDefault();
-      // Store the event so it can be triggered later
-      setInstallPrompt(e as BeforeInstallPromptEvent);
+      console.log('beforeinstallprompt event fired');
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsVisible(true);
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener('beforeinstallprompt', handler);
 
-    // Check if the app is already installed
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-    if (isStandalone) {
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsVisible(false);
     }
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener('beforeinstallprompt', handler);
     };
   }, []);
 
-  const handleInstallClick = async () => {
-    if (!installPrompt) return;
-
-    // Show the install prompt
-    await installPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const choiceResult = await installPrompt.userChoice;
-    
-    if (choiceResult.outcome === "accepted") {
-      console.log("User accepted the install prompt");
-    } else {
-      console.log("User dismissed the install prompt");
+  const handleInstall = async () => {
+    if (isIOS) {
+      // For iOS, show instructions
+      alert('To install the app:\n1. Tap the share button in your browser\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm');
+      return;
     }
 
-    // Clear the saved prompt
-    setInstallPrompt(null);
-    setIsVisible(false);
-  };
-
-  const dismissPrompt = () => {
-    setIsVisible(false);
+    if (!deferredPrompt) return;
+    
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('Install prompt outcome:', outcome);
+      if (outcome === 'accepted') {
+        setIsVisible(false);
+      }
+    } catch (error) {
+      console.error('Error installing PWA:', error);
+    }
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed left-0 right-0 bottom-0 p-4 z-50">
-      <Alert className="bg-primary/10 border-primary/20 relative">
-        <AlertTitle className="text-primary-foreground font-semibold">
-          Install Nyika Nexus
-        </AlertTitle>
-        <AlertDescription className="text-sm mt-2">
-          Install our app on your device for a better experience and offline access.
-        </AlertDescription>
-        <div className="flex gap-3 mt-3">
-          <Button 
-            size="sm" 
-            onClick={handleInstallClick}
-            className="bg-primary hover:bg-primary/90"
+    <Card className="fixed bottom-4 right-4 w-80 shadow-lg z-50">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Install App</CardTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsVisible(false)}
           >
-            Install
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            onClick={dismissPrompt}
-          >
-            Not now
+            <X className="h-4 w-4" />
           </Button>
         </div>
-        <button
-          onClick={dismissPrompt}
-          className="absolute top-2 right-2 text-foreground/60 hover:text-foreground"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </Alert>
-    </div>
+        <CardDescription>
+          Install Nyika Nexus on your device for a better experience
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">
+          {isIOS 
+            ? 'Add this app to your home screen for quick access'
+            : 'Get quick access to all features and work offline'}
+        </p>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleInstall} className="w-full">
+          {isIOS ? 'Add to Home Screen' : 'Install Now'}
+        </Button>
+      </CardFooter>
+    </Card>
   );
-};
-
-export default InstallPrompt;
+}
