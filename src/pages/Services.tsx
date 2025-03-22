@@ -42,7 +42,6 @@ const mockServiceOrders = [
     id: "s1",
     title: "Comprehensive Soil Analysis",
     description: "Complete nutrient profile, pH level, organic matter content, and recommendations for soil improvement.",
-    type: "soil_analysis" as const,
     status: "completed" as const,
     date: "April 15, 2023",
     location: "North Field, Plot 3",
@@ -51,8 +50,7 @@ const mockServiceOrders = [
     id: "s2",
     title: "Pest Control Fumigation",
     description: "Targeted fumigation to address the recent pest outbreak in the eastern section of the farm.",
-    type: "fumigation" as const,
-    status: "in_progress" as const,
+    status: "in-progress" as const,
     date: "May 8, 2023",
     location: "East Field, Plots 7-9",
   },
@@ -60,8 +58,7 @@ const mockServiceOrders = [
     id: "s3",
     title: "Seasonal Soil Health Check",
     description: "Pre-planting soil analysis to determine optimal fertilizer needs for the upcoming season.",
-    type: "soil_analysis" as const,
-    status: "requested" as const,
+    status: "pending" as const,
     date: "May 12, 2023",
     location: "South Field, All Plots",
   },
@@ -106,7 +103,6 @@ export default function Services() {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const [activeService, setActiveService] = useState<string | null>(null);
   const [serviceDetails, setServiceDetails] = useState({
-    type: "" as "soil_analysis" | "fumigation",
     date: "",
     location: "",
     description: "",
@@ -116,7 +112,6 @@ export default function Services() {
     setActiveService(serviceId);
     setServiceDetails({
       ...serviceDetails,
-      type: serviceId === "soil-analysis" ? "soil_analysis" : "fumigation"
     });
     setIsOrderOpen(true);
   };
@@ -139,7 +134,6 @@ export default function Services() {
     
     setIsOrderOpen(false);
     setServiceDetails({
-      type: "soil_analysis",
       date: "",
       location: "",
       description: "",
@@ -344,10 +338,10 @@ export default function Services() {
                         id={service.id}
                         title={service.title}
                         description={service.description}
-                        type={service.type}
-                        status={service.status === "in_progress" ? "in-progress" : service.status as "pending" | "completed"}
+                        status={service.status}
                         date={service.date}
                         location={service.location}
+                        onViewDetails={() => {}}
                       />
                     ))}
                     

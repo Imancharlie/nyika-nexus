@@ -38,6 +38,7 @@ self.addEventListener('activate', (event: any) => {
           console.log('Service worker: Removing old cache', key);
           return caches.delete(key);
         }
+        return Promise.resolve();
       }));
     })
   );
@@ -80,5 +81,6 @@ self.addEventListener('fetch', (event: any) => {
   );
 });
 
-// This allows TypeScript to detect that service worker is available
+// This allows the service worker to be properly typed
+declare const self: ServiceWorkerGlobalScope;
 export {};

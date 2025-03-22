@@ -1,50 +1,24 @@
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shell } from "@/components/layout/shell";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
-import { PlusCircle, ArrowRight } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
-import { cn } from "@/lib/utils";
+import ChallengeCard from "@/components/dashboard/ChallengeCard";
+import ServiceCard from "@/components/dashboard/ServiceCard";
 
-interface ChallengeCardProps {
+interface ChallengeData {
   id: string;
   title: string;
   description: string;
   status: "pending" | "resolved";
   date: string;
-  imageUrl?: string;
 }
 
-const ChallengeCard: React.FC<ChallengeCardProps> = ({
-  id,
-  title,
-  description,
-  status,
-  date,
-  imageUrl,
-}) => {
-  return (
-    <Card className="h-full flex flex-col">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{date}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        {imageUrl && (
-          <img src={imageUrl} alt={title} className="w-full h-32 object-cover mb-4 rounded-md" />
-        )}
-        <p className="text-sm text-muted-foreground">{description}</p>
-        <div className="mt-4">
-          Status: {status}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-interface ServiceCardProps {
+interface ServiceData {
   id: string;
   title: string;
   description: string;
@@ -54,39 +28,10 @@ interface ServiceCardProps {
   location: string;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({
-  id,
-  title,
-  description,
-  type,
-  status,
-  date,
-  location,
-}) => {
-  return (
-    <Card className="h-full flex flex-col">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{date}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-sm text-muted-foreground">{description}</p>
-        <div className="mt-4">
-          Type: {type}
-          <br />
-          Status: {status}
-          <br />
-          Location: {location}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
 
-  const challenges: Omit<ChallengeCardProps, "imageUrl">[] = [
+  const challenges: ChallengeData[] = [
     {
       id: "1",
       title: "Pest Infestation",
@@ -103,7 +48,7 @@ const Dashboard = () => {
     },
   ];
 
-  const services: Omit<ServiceCardProps, "location">[] = [
+  const services: ServiceData[] = [
     {
       id: "1",
       title: "Soil Analysis",
@@ -111,6 +56,7 @@ const Dashboard = () => {
       type: "Analysis",
       status: "in-progress",
       date: "2024-07-20",
+      location: "North Field",
     },
     {
       id: "2",
@@ -119,6 +65,7 @@ const Dashboard = () => {
       type: "Fumigation",
       status: "pending",
       date: "2024-07-25",
+      location: "South Field",
     },
   ];
 
@@ -160,9 +107,8 @@ const Dashboard = () => {
                   id={challenge.id}
                   title={challenge.title}
                   description={challenge.description}
-                  status={challenge.status === "pending" ? "pending" : "resolved"}
+                  status={challenge.status}
                   date={challenge.date}
-                  imageUrl={challenge.imageUrl}
                 />
               ))}
             </div>
@@ -177,10 +123,10 @@ const Dashboard = () => {
                   id={service.id}
                   title={service.title}
                   description={service.description}
-                  type={service.type}
-                  status={service.status === "in_progress" ? "in-progress" : service.status as "pending" | "completed"}
+                  status={service.status}
                   date={service.date}
                   location={service.location}
+                  onViewDetails={() => {}}
                 />
               ))}
             </div>

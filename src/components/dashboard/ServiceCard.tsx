@@ -1,7 +1,10 @@
 
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Calendar, CheckCircle2, Clock } from "lucide-react-native";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface ServiceCardProps {
   id: string;
@@ -9,42 +12,9 @@ export interface ServiceCardProps {
   description: string;
   date: string;
   status: "pending" | "in-progress" | "completed";
+  location: string;
   onViewDetails?: () => void;
 }
-
-// Helper function to determine badge details based on status
-const getStatusDetails = (status: ServiceCardProps["status"]) => {
-  switch (status) {
-    case "pending":
-      return {
-        label: "Pending",
-        color: "#f3f4f6", // secondary color equivalent
-        textColor: "#6b7280", // muted text color
-        icon: Clock,
-      };
-    case "in-progress":
-      return {
-        label: "In Progress",
-        color: "#f3f4f6", // secondary color equivalent
-        textColor: "#6b7280", // muted text color
-        icon: Calendar,
-      };
-    case "completed":
-      return {
-        label: "Completed",
-        color: "#10b981", // primary/green color equivalent
-        textColor: "#ffffff", // white text
-        icon: CheckCircle2,
-      };
-    default:
-      return {
-        label: "Unknown",
-        color: "#e5e7eb", // outline color equivalent
-        textColor: "#6b7280", // muted text color
-        icon: Clock,
-      };
-  }
-};
 
 export default function ServiceCard({
   id,
@@ -52,110 +22,78 @@ export default function ServiceCard({
   description,
   date,
   status,
+  location,
   onViewDetails,
 }: ServiceCardProps) {
-  const statusDetails = getStatusDetails(status);
-  const StatusIcon = statusDetails.icon;
+  // Helper function to get status badge details
+  const getStatusBadge = () => {
+    switch (status) {
+      case "pending":
+        return {
+          label: "Pending",
+          variant: "outline" as const,
+          icon: <Clock className="h-3 w-3 mr-1" />,
+        };
+      case "in-progress":
+        return {
+          label: "In Progress",
+          variant: "secondary" as const,
+          icon: <Calendar className="h-3 w-3 mr-1" />,
+        };
+      case "completed":
+        return {
+          label: "Completed",
+          variant: "default" as const,
+          icon: <CheckCircle className="h-3 w-3 mr-1" />,
+        };
+      default:
+        return {
+          label: "Unknown",
+          variant: "outline" as const,
+          icon: <AlertCircle className="h-3 w-3 mr-1" />,
+        };
+    }
+  };
+
+  const statusBadge = getStatusBadge();
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <View style={[styles.badge, { backgroundColor: statusDetails.color }]}>
-            <StatusIcon size={14} color={statusDetails.textColor} style={styles.badgeIcon} />
-            <Text style={[styles.badgeText, { color: statusDetails.textColor }]}>
-              {statusDetails.label}
-            </Text>
-          </View>
-        </View>
-        <Text style={styles.date}>Requested on {date}</Text>
-      </View>
-      <View style={styles.cardContent}>
-        <Text style={styles.description}>{description}</Text>
-      </View>
-      <View style={styles.cardFooter}>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={onViewDetails}
+    <Card className={cn(
+      "overflow-hidden transition-all duration-300 hover:shadow-md",
+      status === "completed" ? "bg-green-50/50 dark:bg-green-950/10" : ""
+    )}>
+      <CardHeader className="p-4 pb-2">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-medium text-lg">{title}</h3>
+            <p className="text-muted-foreground text-xs mt-1">Requested on {date}</p>
+          </div>
+          <Badge variant={statusBadge.variant} className="ml-2">
+            {statusBadge.icon}
+            {statusBadge.label}
+          </Badge>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-4 pt-2">
+        <p className="text-sm text-foreground/90">
+          {description}
+        </p>
+        <div className="mt-3 text-xs text-muted-foreground">
+          <p>Location: {location}</p>
+        </div>
+      </CardContent>
+      
+      <CardFooter className="p-4 pt-0">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full"
+          onClick={onViewDetails}
         >
-          <Text style={styles.buttonText}>View Details</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          View Details
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  cardHeader: {
-    padding: 16,
-    paddingBottom: 8,
-  },
-  titleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    flex: 1,
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 16,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginLeft: 8,
-  },
-  badgeIcon: {
-    marginRight: 4,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  date: {
-    fontSize: 14,
-    color: "#6b7280",
-  },
-  cardContent: {
-    padding: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: "rgba(0, 0, 0, 0.8)",
-  },
-  cardFooter: {
-    padding: 16,
-    paddingTop: 8,
-  },
-  button: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 6,
-    padding: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#374151",
-  },
-});
