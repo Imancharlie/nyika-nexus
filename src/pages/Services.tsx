@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PageTransition } from "@/components/shared/AnimatedWrapper";
 import { Motion } from "@/components/ui/motion";
@@ -339,12 +338,17 @@ export default function Services() {
               <Motion fadeIn>
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {services.map((service, index) => (
-                      <Motion key={service.id} fadeInUp delay={index * 50}>
-                        <ServiceCard
-                          {...service}
-                        />
-                      </Motion>
+                    {services.map((service) => (
+                      <ServiceCard
+                        key={service.id}
+                        id={service.id}
+                        title={service.title}
+                        description={service.description}
+                        type={service.type}
+                        status={service.status === "in_progress" ? "in-progress" : service.status as "pending" | "completed"}
+                        date={service.date}
+                        location={service.location}
+                      />
                     ))}
                     
                     {services.length === 0 && (

@@ -1,197 +1,194 @@
-
-import React, { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BellPlus, Filter, Plus } from "lucide-react";
-import ChallengeCard from "@/components/dashboard/ChallengeCard";
-import ServiceCard from "@/components/dashboard/ServiceCard";
-import { useToast } from "@/hooks/use-toast";
+import { Shell } from "@/components/layout/shell";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
+import { PlusCircle, ArrowRight } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
-import AnimatedWrapper from "@/components/shared/AnimatedWrapper";
+import { cn } from "@/lib/utils";
 
-export default function Dashboard() {
-  const { toast } = useToast();
-  
-  // Fixed the type by explicitly defining it as 'pending' | 'resolved' for the status
-  const [challenges, setChallenges] = useState<
-    (
-      | {
-          id: string;
-          title: string;
-          description: string;
-          status: "pending" | "resolved";
-          date: string;
-          imageUrl: string;
-        }
-      | {
-          id: string;
-          title: string;
-          description: string;
-          status: "pending" | "resolved";
-          date: string;
-          imageUrl?: undefined;
-        }
-    )[]
-  >([
-    {
-      id: "1",
-      title: "Tomato leaf issues",
-      description: "Yellow spots appearing on tomato leaves in section B3",
-      status: "pending",
-      date: "2023-09-15",
-      imageUrl: "https://placehold.co/600x400/green/white?text=Tomato+Leaf",
-    },
-    {
-      id: "2",
-      title: "Soil quality concerns",
-      description: "Noticing poor plant growth in the northern section",
-      status: "pending",
-      date: "2023-09-10",
-    },
-    {
-      id: "3",
-      title: "Maize stalks browning",
-      description: "Maize stalks are turning brown prematurely",
-      status: "resolved",
-      date: "2023-08-28",
-    },
-  ]);
+interface ChallengeCardProps {
+  id: string;
+  title: string;
+  description: string;
+  status: "pending" | "resolved";
+  date: string;
+  imageUrl?: string;
+}
 
-  const [services, setServices] = useState<
-    {
-      id: string;
-      title: string;
-      description: string;
-      status: "pending" | "in-progress" | "completed";
-      date: string;
-    }[]
-  >([
-    {
-      id: "1",
-      title: "Soil Testing - Field A",
-      description: "Comprehensive soil analysis for pH, nutrients, and organic matter content",
-      status: "completed",
-      date: "2023-09-01",
-    },
-    {
-      id: "2",
-      title: "Pest Fumigation - Field B",
-      description: "Treatment for spotted aphid infestation on vegetable plots",
-      status: "in-progress",
-      date: "2023-09-12",
-    },
-    {
-      id: "3",
-      title: "Soil Testing - Field C",
-      description: "Basic analysis for new planting area",
-      status: "pending",
-      date: "2023-09-18",
-    },
-  ]);
-
-  const handleResolveChallenge = (id: string) => {
-    setChallenges(
-      challenges.map((challenge) =>
-        challenge.id === id
-          ? { ...challenge, status: "resolved" as const }
-          : challenge
-      )
-    );
-
-    toast({
-      title: "Challenge Resolved",
-      description: "The challenge has been marked as resolved.",
-    });
-  };
-
-  const handleViewChallengeDetails = (id: string) => {
-    // This would typically navigate to a details page or open a modal
-    toast({
-      title: "View Challenge Details",
-      description: `Viewing details for challenge ${id}`,
-    });
-  };
-
-  const handleViewServiceDetails = (id: string) => {
-    // This would typically navigate to a details page or open a modal
-    toast({
-      title: "View Service Details",
-      description: `Viewing details for service ${id}`,
-    });
-  };
-
+const ChallengeCard: React.FC<ChallengeCardProps> = ({
+  id,
+  title,
+  description,
+  status,
+  date,
+  imageUrl,
+}) => {
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8 md:py-12">
-      <AnimatedWrapper>
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your challenges and services
+    <Card className="h-full flex flex-col">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{date}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-grow">
+        {imageUrl && (
+          <img src={imageUrl} alt={title} className="w-full h-32 object-cover mb-4 rounded-md" />
+        )}
+        <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="mt-4">
+          Status: {status}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+interface ServiceCardProps {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: "pending" | "in-progress" | "completed";
+  date: string;
+  location: string;
+}
+
+const ServiceCard: React.FC<ServiceCardProps> = ({
+  id,
+  title,
+  description,
+  type,
+  status,
+  date,
+  location,
+}) => {
+  return (
+    <Card className="h-full flex flex-col">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{date}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-grow">
+        <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="mt-4">
+          Type: {type}
+          <br />
+          Status: {status}
+          <br />
+          Location: {location}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const Dashboard = () => {
+  const { isAuthenticated } = useAuth();
+
+  const challenges: Omit<ChallengeCardProps, "imageUrl">[] = [
+    {
+      id: "1",
+      title: "Pest Infestation",
+      description: "Severe aphid infestation on tomato plants. Need urgent solution.",
+      status: "pending",
+      date: "2024-07-15",
+    },
+    {
+      id: "2",
+      title: "Soil Erosion",
+      description: "Topsoil erosion due to heavy rains. Affecting crop yield.",
+      status: "resolved",
+      date: "2024-07-10",
+    },
+  ];
+
+  const services: Omit<ServiceCardProps, "location">[] = [
+    {
+      id: "1",
+      title: "Soil Analysis",
+      description: "Comprehensive soil analysis to determine nutrient levels.",
+      type: "Analysis",
+      status: "in-progress",
+      date: "2024-07-20",
+    },
+    {
+      id: "2",
+      title: "Fumigation Service",
+      description: "Fumigation service to eliminate soil-borne pathogens.",
+      type: "Fumigation",
+      status: "pending",
+      date: "2024-07-25",
+    },
+  ];
+
+  if (!isAuthenticated) {
+    return (
+      <Shell>
+        <Motion fadeIn>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Please <Link to="/auth" className="text-primary">login</Link> to access the dashboard.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <BellPlus className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-            </Button>
-            <Button variant="outline" size="icon">
-              <Filter className="h-5 w-5" />
-              <span className="sr-only">Filter</span>
+        </Motion>
+      </Shell>
+    );
+  }
+
+  return (
+    <Shell>
+      <Motion fadeIn>
+        <div className="container mx-auto py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <Button asChild>
+              <Link to="/community" className="flex items-center">
+                New Challenge
+                <PlusCircle className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Your Challenges</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {challenges.map((challenge) => (
+                <ChallengeCard
+                  key={challenge.id}
+                  id={challenge.id}
+                  title={challenge.title}
+                  description={challenge.description}
+                  status={challenge.status === "pending" ? "pending" : "resolved"}
+                  date={challenge.date}
+                  imageUrl={challenge.imageUrl}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Your Services</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map((service) => (
+                <ServiceCard
+                  key={service.id}
+                  id={service.id}
+                  title={service.title}
+                  description={service.description}
+                  type={service.type}
+                  status={service.status === "in_progress" ? "in-progress" : service.status as "pending" | "completed"}
+                  date={service.date}
+                  location={service.location}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-
-        <Tabs defaultValue="challenges" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="challenges">Challenges</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="challenges" className="mt-0">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Recent Challenges</h2>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                New Challenge
-              </Button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {challenges.map((challenge, index) => (
-                <Motion key={challenge.id} fadeInUp delay={index * 100}>
-                  <ChallengeCard
-                    {...challenge}
-                    onResolve={() => handleResolveChallenge(challenge.id)}
-                    onViewDetails={() => handleViewChallengeDetails(challenge.id)}
-                  />
-                </Motion>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="services" className="mt-0">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Your Services</h2>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Order Service
-              </Button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((service, index) => (
-                <Motion key={service.id} fadeInUp delay={index * 100}>
-                  <ServiceCard
-                    {...service}
-                    onViewDetails={() => handleViewServiceDetails(service.id)}
-                  />
-                </Motion>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </AnimatedWrapper>
-    </div>
+      </Motion>
+    </Shell>
   );
-}
+};
+
+export default Dashboard;
