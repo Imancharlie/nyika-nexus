@@ -15,7 +15,7 @@ SECRET_KEY = "django-insecure-+t3iu8o$6x2$k*%aspvpz_+ltwz=kgcjgku)h8#mi!zb9nlzi6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True  # Set to False in production
 
-ALLOWED_HOSTS = ['app.agrimika.co.tz']
+ALLOWED_HOSTS = ['app.agrimika.co.tz','nyikanexus.pythonanywhere.com']
 
 # Security settings
 CSRF_COOKIE_SECURE = True
