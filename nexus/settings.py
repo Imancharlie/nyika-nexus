@@ -13,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-+t3iu8o$6x2$k*%aspvpz_+ltwz=kgcjgku)h8#mi!zb9nlzi6"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Set to False in production
+DEBUG = True  # Set to False in production
 
-ALLOWED_HOSTS = ['nyikanexus.pythonanywhere.com']
+ALLOWED_HOSTS = ['app.agrimika.co.tz']
 
 # Security settings
 CSRF_COOKIE_SECURE = True
@@ -86,6 +86,7 @@ DATABASES = {
         }
     }
 }
+
 
 
 
