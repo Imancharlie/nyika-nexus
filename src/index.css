@@ -19,7 +19,7 @@
     --primary: 140 37% 44%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 20 30% 53%;
+    --secondary: 28 45% 50%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 120 3% 96%;
@@ -35,7 +35,7 @@
     --input: 120 5% 88%;
     --ring: 140 37% 44%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -145,4 +145,22 @@ html {
 /* Prevent overflow on mobile */
 body {
   @apply overflow-x-hidden max-w-[100vw];
+}
+
+/* App frame: neutral backdrop around the mobile column on wide screens */
+body {
+  @apply bg-muted/60;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

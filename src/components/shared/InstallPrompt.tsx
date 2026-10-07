@@ -14,11 +14,11 @@ export default function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // Check if running on iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isIOSDevice =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      !(window as unknown as { MSStream?: unknown }).MSStream;
     setIsIOS(isIOSDevice);
 
-    // For iOS devices, show the prompt immediately
     if (isIOSDevice) {
       setIsVisible(true);
       return;
@@ -26,14 +26,12 @@ export default function InstallPrompt() {
 
     const handler = (e: Event) => {
       e.preventDefault();
-      console.log('beforeinstallprompt event fired');
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsVisible(true);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsVisible(false);
     }
@@ -45,17 +43,17 @@ export default function InstallPrompt() {
 
   const handleInstall = async () => {
     if (isIOS) {
-      // For iOS, show instructions
-      alert('To install the app:\n1. Tap the share button in your browser\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm');
+      alert(
+        'Ili kusakinisha:\n1. Gusa kitufe cha kushiriki kwenye kivinjari\n2. Nenda chini na gusa "Ongeza kwenye Skrini ya Mwanzo"\n3. Gusa "Ongeza" kuthibitisha'
+      );
       return;
     }
 
     if (!deferredPrompt) return;
-    
+
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log('Install prompt outcome:', outcome);
       if (outcome === 'accepted') {
         setIsVisible(false);
       }
@@ -67,10 +65,10 @@ export default function InstallPrompt() {
   if (!isVisible) return null;
 
   return (
-    <Card className="fixed bottom-4 right-4 w-80 shadow-lg z-50">
+    <Card className="fixed bottom-24 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 shadow-lg">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Install App</CardTitle>
+          <CardTitle className="text-lg">Sakinisha AGRIMIKA</CardTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -81,19 +79,19 @@ export default function InstallPrompt() {
           </Button>
         </div>
         <CardDescription>
-          Install Nyika Nexus on your device for a better experience
+          Sakinisha AGRIMIKA kwenye simu yako kwa uzoefu bora
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          {isIOS 
-            ? 'Add this app to your home screen for quick access'
-            : 'Get quick access to all features and work offline'}
+          {isIOS
+            ? 'Ongeza kwenye skrini yako ya mwanzo kwa upatiaji wa haraka'
+            : 'Pata upatiaji wa haraka na tumia hata bila intaneti'}
         </p>
       </CardContent>
       <CardFooter>
         <Button onClick={handleInstall} className="w-full">
-          {isIOS ? 'Add to Home Screen' : 'Install Now'}
+          {isIOS ? 'Ongeza kwenye Skrini ya Mwanzo' : 'Sakinisha Sasa'}
         </Button>
       </CardFooter>
     </Card>

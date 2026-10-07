@@ -1,0 +1,60 @@
+import type { AppNotification } from "@/types";
+
+export const initialNotifications: AppNotification[] = [
+  {
+    id: "n-1",
+    type: "huduma",
+    title: "Ombi lako limethibitishwa",
+    body: "Ombi namba AGR-000123 limepokelewa. Tutakupigia simu ili kupanga tarehe.",
+    time: "saa 1 zilizopita",
+    read: false,
+  },
+  {
+    id: "n-2",
+    type: "ushauri",
+    title: "Ushauri wa Dkt. Amina Juma",
+    body: "Dkt. Amina Juma amejibu swali lako kuhusu madoa ya njano kwenye nyanya.",
+    time: "saa 3 zilizopita",
+    read: false,
+  },
+  {
+    id: "n-3",
+    type: "mafunzo",
+    title: "Makala mpya: Magonjwa ya Nyanya",
+    body: "Makala mpya imetolewa kwenye Jifunze. Soma na uhifadhi kwa ajili yako.",
+    time: "jana",
+    read: false,
+  },
+  {
+    id: "n-4",
+    type: "penda",
+    title: "Neema Mushi amependa chapisho lako",
+    body: "\"Mavuno ya nyanya mwaka huu yamekuwa mazuri!\" — likes 42 sasa.",
+    time: "jana",
+    read: true,
+  },
+  {
+    id: "n-5",
+    type: "mikopo",
+    title: "Fursa mpya ya mkopo",
+    body: "TADB imetoa mikopo mipya ya kilimo kuanzia TZS 500,000. Angalia Mikopo.",
+    time: "siku 2 zilizopita",
+    read: true,
+  },
+  {
+    id: "n-6",
+    type: "huduma",
+    title: "Uratibu wa fumigation",
+    body: "Ombi AGR-000118 limekamilika. Ripoti ya huduma ipo kwenye Wasifu wako.",
+    time: "siku 4 zilizopita",
+    read: true,
+  },
+  {
+    id: "n-7",
+    type: "tangazo",
+    title: "Karibu AGRIMIKA",
+    body: "Tumefurahi ujiunge nasi. Anza kwa kuagiza huduma au kusoma makala za Jifunze.",
+    time: "wiki 1 iliyopita",
+    read: true,
+  },
+];

@@ -21,10 +21,11 @@ export default defineConfig(({ mode }) => ({
         enabled: true
       },
       manifest: {
-        name: 'Nyika Nexus',
-        short_name: 'Nyika',
-        description: 'Empowering Farmers with Technology',
-        theme_color: '#10b981',
+        name: 'AGRIMIKA',
+        short_name: 'AGRIMIKA',
+        description: 'Suluhisho rahisi kwa mkulima wa kisasa',
+        lang: 'sw',
+        theme_color: '#479a62',
         icons: [
           {
             src: 'assets/icons/icon-192x192.png',
