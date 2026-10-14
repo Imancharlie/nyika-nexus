@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 140 53% 97%;
+    --foreground: 152 74% 9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 152 74% 9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 152 74% 9%;
+
+    --primary: 150 83% 26%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 211 84% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 140 47% 92%;
+    --muted-foreground: 146 20% 29%;
+
+    --accent: 140 47% 92%;
+    --accent-foreground: 152 74% 9%;
+
+    --destructive: 4 74% 49%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 142 25% 87%;
+    --input: 142 25% 85%;
+    --ring: 143 58% 48%;
+
+    --radius: 1.25rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    @apply bg-lime text-forest;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-lime {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 font-semibold text-forest transition-all;
+    background: linear-gradient(135deg, #D3F77A 0%, #5FD38A 100%);
+    box-shadow: 0 10px 30px -8px rgba(95, 211, 138, .55), inset 0 0 0 1px rgba(255, 255, 255, .35);
+  }
+  .btn-lime:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 36px -8px rgba(95, 211, 138, .7), inset 0 0 0 1px rgba(255, 255, 255, .45);
+  }
+  .btn-lime:disabled {
+    @apply cursor-not-allowed opacity-60;
+    transform: none;
+  }
+  .badge-grad {
+    background: linear-gradient(145deg, #12A05A, #0B7A43);
+    box-shadow: 0 8px 18px -8px rgba(11, 122, 67, .7);
+  }
+  .bg-hero {
+    background: radial-gradient(90% 70% at 80% 0%, #9BE564 0%, #12A05A 30%, #06301A 70%, #03160D 100%);
+  }
+  .bg-learn {
+    background: linear-gradient(160deg, #0D7443 0%, #06301A 72%);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply overflow-x-hidden max-w-[100vw];
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-primary/20;
+}
