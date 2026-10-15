@@ -9,7 +9,9 @@ export function startHeroScene(
   cv: HTMLCanvasElement,
   cv2: HTMLCanvasElement,
   hint: HTMLElement | null,
+  opts?: { compact?: boolean },
 ): () => void {
+  const compact = Boolean(opts?.compact);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const ctxMain = cv.getContext("2d")!;
   const ctx2 = cv2.getContext("2d")!;
@@ -31,7 +33,15 @@ export function startHeroScene(
   let plants: Plant[] = [], flies: Fly[] = [];
   let skyC: HTMLCanvasElement, hillC: HTMLCanvasElement;
   let t0 = performance.now(), last = t0, raf = 0, running = false, inView = true, disposed = false;
-  const S = { px: 0.72, py: 0.35, tx: 0.72, ty: 0.35, tilt: 0, lastMove: -1e9, ripples: [] as Ripple[] };
+  const S = {
+    px: compact ? 0.8 : 0.72,
+    py: compact ? 0.4 : 0.35,
+    tx: compact ? 0.8 : 0.72,
+    ty: compact ? 0.4 : 0.35,
+    tilt: 0,
+    lastMove: -1e9,
+    ripples: [] as Ripple[],
+  };
 
   function makeGlow() {
     const s = 64, c = document.createElement("canvas");
@@ -54,16 +64,16 @@ export function startHeroScene(
 
   function build() {
     const r = hero.getBoundingClientRect();
-    W = Math.max(320, Math.round(r.width));
-    H = Math.max(480, Math.round(r.height));
+    W = Math.max(compact ? 300 : 320, Math.round(r.width));
+    H = Math.max(compact ? 300 : 480, Math.round(r.height));
     DPR = Math.min(2, window.devicePixelRatio || 1);
     cv.width = cv2.width = Math.round(W * DPR);
     cv.height = cv2.height = Math.round(H * DPR);
     mob = W < 700;
-    horizon = mob ? Math.min(H * 0.4, 380) : H * 0.6;
-    vx = W * (mob ? 0.62 : 0.68);
-    fieldB = mob ? horizon + W * 1.3 : H * 1.12;
-    HS = mob ? Math.min(H, 760) : H;
+    horizon = mob ? (compact ? Math.min(250, H * 0.42) : Math.min(H * 0.4, 380)) : H * 0.6;
+    vx = W * (mob ? 0.62 : compact ? 0.72 : 0.68);
+    fieldB = mob ? horizon + W * 1.3 : H * (compact ? 1.15 : 1.12);
+    HS = mob ? (compact ? Math.min(520, H) : Math.min(H, 760)) : compact ? H * 1.5 : H;
     const mk = (): [HTMLCanvasElement, CanvasRenderingContext2D] => {
       const c = document.createElement("canvas");
       c.width = cv.width;
@@ -214,21 +224,35 @@ export function startHeroScene(
     const since = still ? 1e6 : now - t0, dt = Math.min(50, now - last);
     last = now;
     const sunP = ease(clamp(since / 3200, 0, 1)), droneP = ease(clamp((since - 700) / 2400, 0, 1)), beamA = smooth(clamp((since - 2100) / 1100, 0, 1));
-    if (still) { S.tx = 0.72; S.ty = 0.36; }
+    if (still) { S.tx = compact ? 0.8 : 0.72; S.ty = compact ? 0.4 : 0.36; }
     else if (now - S.lastMove > 3000) {
-      S.tx = W >= 1000 ? 0.77 + 0.12 * Math.sin(now * 0.00035) : 0.5 + 0.3 * Math.sin(now * 0.00035);
-      S.ty = 0.38 + 0.14 * Math.sin(now * 0.0007 + 1.2);
+      if (compact) {
+        S.tx = W >= 900 ? 0.8 + 0.1 * Math.sin(now * 0.00035) : 0.55 + 0.3 * Math.sin(now * 0.00035);
+        S.ty = 0.4 + 0.15 * Math.sin(now * 0.0007 + 1.2);
+      } else {
+        S.tx = W >= 1000 ? 0.77 + 0.12 * Math.sin(now * 0.00035) : 0.5 + 0.3 * Math.sin(now * 0.00035);
+        S.ty = 0.38 + 0.14 * Math.sin(now * 0.0007 + 1.2);
+      }
     }
     const k = Math.min(1, dt * 0.0045), prev = S.px;
     S.px += (S.tx - S.px) * k;
     S.py += (S.ty - S.py) * k;
     const vel = ((S.px - prev) * W) / Math.max(dt, 1);
     S.tilt += (clamp(vel * 0.55, -0.28, 0.28) - S.tilt) * 0.12;
-    const sc = clamp(W / 1250, 0.56, 1.2);
-    const dx = S.px * W, dy = (mob ? lerp(120, 240, S.py) : lerp(0.2, 0.4, S.py) * H) + (still ? 0 : Math.sin(now * 0.0021) * 6) - (1 - droneP) * H * 0.62;
-    const tc = clamp(S.py, 0, 1), gx = dx, gy = horizon + (mob ? (fieldB - horizon) * lerp(0.1, 0.36, tc) : (H * 1.02 - horizon) * lerp(0.2, 0.62, tc));
+    const sc = compact
+      ? (mob ? 0.5 : clamp(Math.min(W / 1400, H / 380), 0.42, 0.8))
+      : clamp(W / 1250, 0.56, 1.2);
+    const bob = still ? 0 : Math.sin(now * 0.0021) * (compact ? 5 : 6);
+    const dy = compact
+      ? (mob ? lerp(62, 130, S.py) : lerp(0.16, 0.36, S.py) * H) + bob - (1 - droneP) * H * 0.7
+      : (mob ? lerp(120, 240, S.py) : lerp(0.2, 0.4, S.py) * H) + bob - (1 - droneP) * H * 0.62;
+    const dx = S.px * W;
+    const tc = clamp(S.py, 0, 1), gx = dx;
+    const gy = compact
+      ? horizon + (mob ? (fieldB - horizon) * lerp(0.03, 0.15, tc) : (H - horizon) * lerp(0.2, 0.75, tc))
+      : horizon + (mob ? (fieldB - horizon) * lerp(0.1, 0.36, tc) : (H * 1.02 - horizon) * lerp(0.2, 0.62, tc));
     const tt = clamp((gy - horizon) / (fieldB - horizon), 0, 1);
-    const rx = Math.max(lerp(0.075, 0.2, tt) * W, 84), ry = rx * 0.3;
+    const rx = Math.max(lerp(compact ? 0.06 : 0.075, compact ? 0.14 : 0.2, tt) * W, compact ? 64 : 84), ry = rx * 0.3;
 
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.globalCompositeOperation = "source-over";
@@ -397,6 +421,10 @@ export function startHeroScene(
   };
   hero.addEventListener("pointermove", onMove);
   hero.addEventListener("pointerdown", onDown);
+  const onPulse = () => {
+    S.ripples.push({ x: W * 0.5, y: H * 1.1, t0: performance.now(), sp: 760, life: 2400 });
+  };
+  window.addEventListener("agrimika:pulse", onPulse);
   const io = new IntersectionObserver((es) => {
     inView = es[0].isIntersecting;
     sync();
@@ -428,5 +456,6 @@ export function startHeroScene(
     document.removeEventListener("visibilitychange", sync);
     hero.removeEventListener("pointermove", onMove);
     hero.removeEventListener("pointerdown", onDown);
+    window.removeEventListener("agrimika:pulse", onPulse);
   };
 }

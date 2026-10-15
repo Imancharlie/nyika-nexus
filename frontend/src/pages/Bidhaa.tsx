@@ -129,7 +129,7 @@ const Bidhaa = () => {
       </div>
 
       <QueryState isLoading={isLoading} isError={isError} onRetry={refetch} empty={!visible.length} emptyText={t("shop.empty")}>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {visible.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -145,7 +145,7 @@ const Bidhaa = () => {
       </Link>
 
       {count > 0 && (
-        <div className="sticky bottom-24 z-30">
+        <div className="sticky bottom-4 z-30">
           <Link to="/kikapu" className="btn-lime w-full justify-between px-5 text-base shadow-xl">
             <span className="flex items-center gap-2">
               <ShoppingCart className="h-5 w-5" /> {t("shop.cart")} · {count}

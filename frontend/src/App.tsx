@@ -72,7 +72,7 @@ const App = () => (
                 <Routes>
                   <Route path="/jisajili" element={<GuestOnly><Signup /></GuestOnly>} />
                   <Route path="/ingia" element={<GuestOnly><Login /></GuestOnly>} />
-                  <Route path="/thibitisha" element={<GuestOnly><VerifyPhone /></GuestOnly>} />
+                  <Route path="/thibitisha" element={<VerifyPhone />} />
                   <Route path="/sahau-nenosiri" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
 
                   <Route path="/admin" element={<RequireStaff />}>

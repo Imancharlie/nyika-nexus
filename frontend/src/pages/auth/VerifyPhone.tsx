@@ -10,7 +10,7 @@ import { api, ApiError } from "@/lib/api";
 
 const VerifyPhone = () => {
   const { t } = useLanguage();
-  const { acceptAuth } = useAuth();
+  const { user, acceptAuth } = useAuth();
   const navigate = useNavigate();
   const pending = useLocation().state as PendingVerification | null;
   const [code, setCode] = useState("");
@@ -24,7 +24,7 @@ const VerifyPhone = () => {
     return () => clearTimeout(id);
   }, [wait]);
 
-  if (!pending?.phone) return <Navigate to="/ingia" replace />;
+  if (!pending?.phone) return <Navigate to={user ? "/" : "/ingia"} replace />;
 
   const confirm = async (value = code) => {
     if (value.length !== 6) return;

@@ -5,6 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useArticles, useExperts, useGroups, usePackages, usePosts, useProducts } from "@/hooks/useApi";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { formatTZS } from "@/lib/utils";
 
 const suggestions = ["Magonjwa ya nyanya", "Mbolea", "Mbegu", "Fumigation", "Mkopo"];

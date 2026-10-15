@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import MobileLayout from "@/layouts/MobileLayout";
+import DashLayout from "@/layouts/DashLayout";
 import Landing from "@/pages/landing/Landing";
 
 const Splash = () => (
@@ -23,7 +23,7 @@ export const AppShell = () => {
     if (location.pathname === "/") return <Landing />;
     return <Navigate to="/ingia" replace state={{ from: location.pathname + location.search }} />;
   }
-  return <MobileLayout />;
+  return <DashLayout />;
 };
 
 /** Login/signup pages: already signed-in users go straight to their home. */
