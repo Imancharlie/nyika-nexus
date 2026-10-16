@@ -6,3 +6,4 @@ django-filter>=24.0
 cryptography>=43.0
 requests>=2.32
 Pillow>=11.0
+gunicorn>=23.0,<24

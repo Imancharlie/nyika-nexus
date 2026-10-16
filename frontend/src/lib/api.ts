@@ -1,4 +1,15 @@
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") || "/api";
+const MEDIA_ORIGIN = BASE.startsWith("http") ? new URL(BASE).origin : "";
+
+function withMediaHost(value: unknown): unknown {
+  if (!MEDIA_ORIGIN) return value;
+  if (typeof value === "string") return value.startsWith("/media/") ? `${MEDIA_ORIGIN}${value}` : value;
+  if (Array.isArray(value)) return value.map(withMediaHost);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, withMediaHost(item)]));
+  }
+  return value;
+}
 const TOKEN_KEY = "agrimika_tokens";
 
 type Tokens = { access: string; refresh: string };
@@ -128,7 +139,7 @@ export async function request<T = unknown>(path: string, opts: Options = {}, ret
     data = { detail: text.slice(0, 200) };
   }
   if (!res.ok) throw new ApiError(res.status, data as Record<string, unknown>);
-  return data as T;
+  return withMediaHost(data) as T;
 }
 
 export const api = {

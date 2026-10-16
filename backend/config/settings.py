@@ -131,6 +131,16 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080")
+CORS_ALLOWED_ORIGIN_REGEXES = [item for item in env_list("CORS_ALLOWED_ORIGIN_REGEXES", "") if item]
+CSRF_TRUSTED_ORIGINS = [item for item in env_list("CSRF_TRUSTED_ORIGINS", "") if item]
+
+# Nginx terminates TLS and forwards the original scheme.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework_simplejwt.authentication.JWTAuthentication"],

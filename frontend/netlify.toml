@@ -12,10 +12,23 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 
 [[redirects]]
+  from = "/api/*"
+  to = "https://agrimika-backendii.kodin.co.tz/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/media/*"
+  to = "https://agrimika-backendii.kodin.co.tz/media/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
 [build.environment]
   NODE_VERSION = "18"
-  NPM_VERSION = "9" 
+  NPM_VERSION = "9"
+  VITE_API_URL = "https://agrimika-backendii.kodin.co.tz/api" 
