@@ -1,6 +1,20 @@
-import type { ReactNode } from "react";
-import { ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import BrandLoader from "@/components/BrandLoader";
 import { cn } from "@/lib/utils";
+
+const useShowAfter = (active: boolean, delay = 320) => {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (!active) {
+      setShow(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setShow(true), delay);
+    return () => window.clearTimeout(timer);
+  }, [active, delay]);
+  return show;
+};
 
 export const PageTitle = ({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) => (
   <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
@@ -90,22 +104,34 @@ export const Select = ({ value, onChange, options, className }: {
   </select>
 );
 
-export const Table = ({ head, children, loading, empty }: { head: string[]; children: ReactNode; loading?: boolean; empty?: boolean }) => (
-  <div className="overflow-x-auto rounded-[22px] border border-border/70 bg-card">
-    <table className="w-full min-w-[720px] text-left text-sm">
-      <thead className="border-b bg-chip/50 text-xs uppercase tracking-wide text-muted-foreground">
-        <tr>{head.map((h) => <th key={h} className="px-4 py-3 font-semibold">{h}</th>)}</tr>
-      </thead>
-      <tbody className="divide-y">{children}</tbody>
-    </table>
-    {loading && (
-      <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading...
-      </div>
-    )}
-    {!loading && empty && <p className="py-10 text-center text-sm text-muted-foreground">Nothing here yet.</p>}
-  </div>
-);
+export const Table = ({ head, children, loading, empty }: { head: string[]; children: ReactNode; loading?: boolean; empty?: boolean }) => {
+  const showLoader = useShowAfter(!!loading);
+  return (
+    <div
+      className="adm-table overflow-x-auto rounded-[22px] border border-border/70 bg-card"
+      onClick={(event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest("button, a, select, input, textarea, label")) return;
+        const row = target.closest("tr");
+        if (!row || row.classList.contains("detail-row")) return;
+        row.querySelector<HTMLElement>("[data-view]")?.click();
+      }}
+    >
+      <table className="w-full min-w-[720px] text-left text-sm">
+        <thead className="border-b bg-[#f2fbf5] text-xs uppercase tracking-wide text-muted-foreground">
+          <tr>{head.map((h) => <th key={h} className="px-4 py-3 font-semibold">{h}</th>)}</tr>
+        </thead>
+        <tbody className="divide-y">{children}</tbody>
+      </table>
+      {loading && showLoader && (
+        <div className="flex flex-col items-center justify-center gap-2 bg-[#f2fbf5] py-8 text-sm text-[#3c5a49]">
+          <BrandLoader size="sm" /> Loading...
+        </div>
+      )}
+      {!loading && empty && <p className="py-10 text-center text-sm text-muted-foreground">Nothing here yet.</p>}
+    </div>
+  );
+};
 
 export const Td = ({ children, className }: { children?: ReactNode; className?: string }) => (
   <td className={cn("px-4 py-3 align-top", className)}>{children}</td>
@@ -126,18 +152,20 @@ export const Pager = ({ page, count, pageSize = 50, onPage }: { page: number; co
   );
 };
 
-export const Btn = ({ children, onClick, variant = "primary", type = "button", disabled, className }: {
+export const Btn = ({ children, onClick, variant = "primary", type = "button", disabled, className, view }: {
   children: ReactNode;
   onClick?: () => void;
   variant?: "primary" | "outline" | "danger" | "ghost";
   type?: "button" | "submit";
   disabled?: boolean;
   className?: string;
+  view?: boolean;
 }) => (
   <button
     type={type}
     onClick={onClick}
     disabled={disabled}
+    data-view={view ? "" : undefined}
     className={cn(
       "inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 text-sm font-semibold transition disabled:opacity-50",
       variant === "primary" && "bg-emerald text-white hover:bg-emerald/90",

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { Send } from "lucide-react";
+import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
 import QueryState from "@/components/QueryState";
 import { Input } from "@/components/ui/input";
@@ -24,9 +25,14 @@ const TicketDetail = () => {
   const send = async (e: FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    await reply.mutateAsync({ id: ticket.id, body: body.trim() });
-    setBody("");
-    refetch();
+    try {
+      await reply.mutateAsync({ id: ticket.id, body: body.trim() });
+      setBody("");
+      toast.success(t("help.sent"));
+      refetch();
+    } catch {
+      toast.error(t("toast.fail"));
+    }
   };
 
   return (

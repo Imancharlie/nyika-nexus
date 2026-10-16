@@ -121,12 +121,12 @@ const PackagesTab = () => {
       <div className="mb-4 flex justify-end"><Btn onClick={() => setEditing(blank)}><Plus className="h-4 w-4" /> New package</Btn></div>
       <Table head={["Package", "Type", "Price", "Status", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((p) => (
-          <tr key={p.id} className="hover:bg-chip/30">
+          <tr key={p.id} className="cursor-pointer hover:bg-chip/30">
             <Td><p className="font-semibold">{p.name}</p><p className="text-xs text-muted-foreground">{p.coverage} · {p.duration}</p></Td>
             <Td>{p.serviceType}</Td>
             <Td className="tabular-nums">{formatTZS(p.price)}</Td>
             <Td className="space-x-1">{p.active ? <Pill tone="green">visible</Pill> : <Pill>hidden</Pill>}{p.featured && <Pill tone="blue">featured</Pill>}</Td>
-            <Td><Btn variant="ghost" onClick={() => edit(p)}><Pencil className="h-4 w-4" /></Btn></Td>
+            <Td className="row-actions"><Btn view variant="ghost" onClick={() => edit(p)}><Pencil className="h-4 w-4" /></Btn></Td>
           </tr>
         ))}
       </Table>

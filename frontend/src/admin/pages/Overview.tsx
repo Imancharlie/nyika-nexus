@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { AlertTriangle, CheckCircle2, KeyRound, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, CheckCircle2, KeyRound } from "lucide-react";
 import { useAdminQuery } from "../lib";
 import { Card, PageTitle, Stat } from "../ui";
+import BrandLoader from "@/components/BrandLoader";
 import { formatTZS } from "@/lib/utils";
 
 type Point = { date: string; value: number };
@@ -23,13 +25,22 @@ const shortDay = (d: string) => new Date(d).toLocaleDateString("en-GB", { day: "
 
 const Overview = () => {
   const { data, isLoading } = useAdminQuery<Metrics>("/admin/metrics/");
+  const [showLoader, setShowLoader] = useState(false);
+  useEffect(() => {
+    if (!isLoading) {
+      setShowLoader(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setShowLoader(true), 320);
+    return () => window.clearTimeout(timer);
+  }, [isLoading]);
 
   if (isLoading || !data)
-    return (
-      <div className="flex items-center gap-2 py-20 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin" /> Loading metrics...
+    return showLoader ? (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-3xl bg-[#f2fbf5] py-20 text-[#3c5a49]">
+        <BrandLoader /> Loading metrics...
       </div>
-    );
+    ) : <div className="min-h-16" />;
 
   const t = data.totals;
   const todo = [

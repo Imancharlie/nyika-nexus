@@ -2,6 +2,8 @@ from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
+from common.fields import media_url
+
 from .models import TZ_REGIONS, User
 from .phone import normalize_tz_phone
 
@@ -32,9 +34,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_avatar(self, obj):
         if obj.avatar:
-            request = self.context.get("request")
-            return request.build_absolute_uri(obj.avatar.url) if request else obj.avatar.url
+            return media_url(self.context.get("request"), obj.avatar)
         return f"https://api.dicebear.com/7.x/initials/svg?seed={obj.full_name}&backgroundColor=0B7A43"
+
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    firstName = serializers.CharField(source="first_name", read_only=True)
+    lastName = serializers.CharField(source="last_name", read_only=True)
+    fullName = serializers.CharField(source="full_name", read_only=True)
+    avatar = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "firstName", "lastName", "fullName", "phone", "region", "location", "avatar"]
+
+    def get_avatar(self, obj):
+        return UserSerializer(context=self.context).get_avatar(obj)
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -71,6 +86,7 @@ class RegisterSerializer(PasswordPairMixin):
     lastName = serializers.CharField(max_length=150)
     phone = PhoneField()
     region = serializers.ChoiceField(choices=TZ_REGIONS, required=False, allow_blank=True)
+    language = serializers.ChoiceField(choices=["sw", "en"], required=False, default="sw")
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
@@ -94,6 +110,7 @@ class RegisterSerializer(PasswordPairMixin):
             last_name=validated["lastName"],
             phone=validated["phone"],
             region=validated.get("region", ""),
+            language=validated.get("language", "sw"),
             password=validated["password"],
         )
 

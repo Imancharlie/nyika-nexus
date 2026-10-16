@@ -17,6 +17,7 @@ from .serializers import (
     ProfileUpdateSerializer,
     RegisterSerializer,
     ResetConfirmSerializer,
+    PublicUserSerializer,
     UserSerializer,
     VerifyConfirmSerializer,
 )
@@ -173,6 +174,14 @@ class PasswordResetConfirmView(APIView):
         user.phone_verified = True
         user.save(update_fields=["password", "phone_verified"])
         return Response(auth_payload(user, request))
+
+
+class PublicUserView(APIView):
+    def get(self, request, pk):
+        user = User.objects.filter(pk=pk, is_active=True).first()
+        if not user:
+            return Response({"detail": "Mtumiaji hajapatikana."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(PublicUserSerializer(user, context={"request": request}).data)
 
 
 class MeView(APIView):

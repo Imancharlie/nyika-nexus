@@ -38,6 +38,7 @@ class Post(models.Model):
     text = models.TextField(max_length=3000)
     image_url = models.URLField(max_length=500, blank=True)
     image_file = models.ImageField(upload_to="posts/", blank=True, null=True)
+    video_file = models.FileField(upload_to="posts/videos/", blank=True, null=True)
     hidden = models.BooleanField(default=False)
     seed_likes = models.PositiveIntegerField(default=0, help_text="Likes carried over from demo data")
     created_at = models.DateTimeField(auto_now_add=True)

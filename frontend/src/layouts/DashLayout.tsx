@@ -6,9 +6,9 @@ import {
   GraduationCap,
   Home,
   LayoutGrid,
-  LifeBuoy,
   LogOut,
   Menu,
+  Shield,
   Search,
   Settings,
   ShoppingCart,
@@ -22,6 +22,7 @@ import { useCart } from "@/context/CartContext";
 import { useUnreadCount } from "@/hooks/useApi";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { StringKey } from "@/i18n/strings";
+import BottomNav from "@/components/layout/BottomNav";
 import "./dash.css";
 
 export type DashContext = { query: string };
@@ -36,9 +37,9 @@ const Wave = () => (
 
 const MAIN: { id: string; to: string; icon: LucideIcon; label: StringKey }[] = [
   { id: "muhtasari", to: "/", icon: Home, label: "shell.nav_overview" },
-  { id: "huduma", to: "/#huduma", icon: LayoutGrid, label: "shell.nav_services" },
-  { id: "soko", to: "/#soko", icon: Box, label: "shell.nav_market" },
-  { id: "jamii", to: "/#jamii", icon: Users, label: "shell.nav_comm" },
+  { id: "huduma", to: "/huduma", icon: LayoutGrid, label: "shell.nav_services" },
+  { id: "soko", to: "/bidhaa", icon: Box, label: "shell.nav_market" },
+  { id: "jamii", to: "/post", icon: Users, label: "shell.nav_comm" },
 ];
 
 const CRUMBS: [string, StringKey][] = [
@@ -73,7 +74,7 @@ const DashLayout = () => {
   const { user, logout } = useAuth();
   const { count } = useCart();
   const unread = useUnreadCount();
-  const { t, lang, setLang } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -93,6 +94,12 @@ const DashLayout = () => {
   useEffect(() => {
     setOpen(false);
   }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    if (location.hash) return;
+    window.scrollTo(0, 0);
+    document.querySelector(".dash .main")?.scrollTo(0, 0);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -158,7 +165,7 @@ const DashLayout = () => {
             <img className="word" src="/brand/wordmark-light.png" alt="AGRIMIKA" />
           </Link>
 
-          <div className="grp-t">{t("shell.nav_main")}</div>
+          <div className="side-scroll">
           <nav className="nav">
             {MAIN.map((item) => {
               const current = home ? spy === item.id : routeCurrent(location.pathname, item.id);
@@ -171,36 +178,35 @@ const DashLayout = () => {
             })}
             <NavLink to="/jifunze" aria-current={location.pathname.startsWith("/jifunze") ? "true" : undefined}>
               <GraduationCap className="ic" strokeWidth={1.7} />
-              <span>Agri-Learn</span>
-            </NavLink>
-          </nav>
-
-          <div className="grp-t">{t("shell.nav_acct")}</div>
-          <nav className="nav">
-            <NavLink to="/wasifu">
-              <User className="ic" strokeWidth={1.7} />
-              <span>{t("shell.nav_profile")}</span>
+              <span>{t("dash.app_learn")}</span>
             </NavLink>
             <NavLink to="/mipangilio">
               <Settings className="ic" strokeWidth={1.7} />
               <span>{t("shell.nav_settings")}</span>
             </NavLink>
-            <NavLink to="/msaada">
-              <LifeBuoy className="ic" strokeWidth={1.7} />
-              <span>{t("shell.nav_help")}</span>
+            <NavLink to="/wasifu">
+              <User className="ic" strokeWidth={1.7} />
+              <span>{t("shell.nav_profile")}</span>
             </NavLink>
           </nav>
+          </div>
 
+          <div className="help">
+            <Wave />
+            <b>{t("shell.help_h")}</b>
+            <p>{t("shell.help_p")}</p>
+            <Link to="/msaada">
+              {t("shell.help_a")} <ArrowUpRight className="ic" />
+            </Link>
+          </div>
           <div className="side-bottom">
-            <div className="help">
-              <Wave />
-              <b>{t("shell.help_h")}</b>
-              <p>{t("shell.help_p")}</p>
-              <Link to="/msaada">
-                {t("shell.help_a")} <ArrowUpRight className="ic" />
-              </Link>
-            </div>
             <nav className="nav">
+              {user?.isStaff && (
+                <NavLink to="/admin">
+                  <Shield className="ic" strokeWidth={1.7} />
+                  <span>{t("shell.nav_admin")}</span>
+                </NavLink>
+              )}
               <button type="button" className="nav-link" onClick={signOut}>
                 <LogOut className="ic" strokeWidth={1.7} />
                 <span>{t("shell.nav_logout")}</span>
@@ -221,6 +227,9 @@ const DashLayout = () => {
             >
               <Menu className="ic" />
             </button>
+            <Link className="top-logo" to="/" aria-label="AGRIMIKA">
+              <img src="/brand/mark-color.png" alt="" />
+            </Link>
             <div className="crumb">
               AGRIMIKA <span style={{ padding: "0 6px", opacity: 0.5 }}>/</span> <b>{t(crumb)}</b>
             </div>
@@ -234,11 +243,10 @@ const DashLayout = () => {
                 aria-label={t("shell.search_ph")}
               />
             </form>
+            <Link className="ibtn jump" to="/utafutaji" aria-label={t("nav.search")}>
+              <Search className="ic" />
+            </Link>
             <div className="tools">
-              <div className="lang" role="group" aria-label="Language">
-                <button type="button" aria-pressed={lang === "sw"} onClick={() => setLang("sw")}>SW</button>
-                <button type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>EN</button>
-              </div>
               <Link className="ibtn" to="/kikapu" aria-label={t("shell.cart")}>
                 <ShoppingCart className="ic" />
                 {count > 0 && <span className="count">{count > 9 ? "9+" : count}</span>}
@@ -262,6 +270,7 @@ const DashLayout = () => {
           </main>
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CheckCircle2, Loader2, Smartphone } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useOrderActions, type PayResult } from "@/hooks/useApi";
@@ -30,9 +31,15 @@ const PayDialog = ({ order, onClose }: Props) => {
     if (!normalized) return setError(t("auth.err_phone"));
     setError(null);
     try {
-      setResult(await pay.mutateAsync({ id: order.id, phone: normalized }));
+      const paid = await pay.mutateAsync({ id: order.id, phone: normalized });
+      setResult(paid);
+      const note = paid.gateway === "failed" ? t("pay.failed_msg") : paid.gateway === "manual" ? t("pay.manual_msg") : t("pay.pending_msg");
+      if (paid.gateway === "failed") toast.error(note);
+      else toast.success(note);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t("auth.err_generic"));
+      const message = err instanceof ApiError ? err.message : t("auth.err_generic");
+      setError(message);
+      toast.error(message);
     }
   };
 

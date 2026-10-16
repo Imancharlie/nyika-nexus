@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Clock, MapPin, Users } from "lucide-react";
+import ImagePreview from "@/components/ImagePreview";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatTZS } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -7,16 +8,15 @@ import type { ServicePackage } from "@/types";
 
 const ServiceCard = ({ pkg }: { pkg: ServicePackage }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   return (
-  <Card className="overflow-hidden border-border/70 py-0">
+  <Card
+    className="cursor-pointer overflow-hidden border-border/70 py-0"
+    onClick={() => navigate(`/huduma/${pkg.id}`)}
+  >
     {pkg.image && (
       <div className="relative h-36 w-full overflow-hidden">
-        <img
-          src={pkg.image}
-          alt={pkg.name}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
+        <ImagePreview src={pkg.image} alt={pkg.name} className="h-full w-full object-cover" />
         <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-primary backdrop-blur">
           {pkg.serviceType}
         </span>
@@ -56,6 +56,7 @@ const ServiceCard = ({ pkg }: { pkg: ServicePackage }) => {
 
       <Link
         to={`/huduma/${pkg.id}`}
+        onClick={(event) => event.stopPropagation()}
         className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
       >
         {t("c.view_package")} <ArrowRight className="h-4 w-4" />

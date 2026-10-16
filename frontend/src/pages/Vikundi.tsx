@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Users } from "lucide-react";
-import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
 import QueryState from "@/components/QueryState";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGroupActions, useGroups } from "@/hooks/useApi";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ApiError } from "@/lib/api";
 import { TZ_REGIONS } from "@/lib/regions";
 import { cropTypes } from "@/lib/utils";
 import type { Group } from "@/types";
@@ -73,8 +71,8 @@ const Vikundi = () => {
       await create.mutateAsync(form);
       setOpen(false);
       setForm({ name: "", description: "", region: "", crop: "" });
-    } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : t("auth.err_generic"));
+    } catch {
+      /* the action already shows the message */
     }
   };
 

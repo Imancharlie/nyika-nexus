@@ -75,6 +75,7 @@ const ServiceRequest = () => {
     try {
       const created = await createRequest.mutateAsync({ packageId: pkg.id, ...form });
       setRequestId(created.id);
+      toast.success(t("svc.sent"));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       if (err instanceof ApiError) {

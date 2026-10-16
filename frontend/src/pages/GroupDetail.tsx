@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { PenSquare } from "lucide-react";
+import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
 import PostCard from "@/components/PostCard";
 import QueryState from "@/components/QueryState";
@@ -24,7 +25,7 @@ const GroupDetail = () => {
 
       <section className="overflow-hidden rounded-[24px] border bg-card">
         <div className="h-28 bg-gradient-to-br from-lime via-leaf to-emerald">
-          {group.image && <img src={group.image} alt="" className="h-full w-full object-cover" />}
+          {group.image && <ImagePreview src={group.image} className="h-full w-full object-cover" />}
         </div>
         <div className="space-y-3 p-4">
           <p className="text-sm text-muted-foreground">{group.description}</p>

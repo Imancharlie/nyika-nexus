@@ -106,6 +106,30 @@ body {
   scrollbar-width: none;
 }
 
+@media (max-width: 760px) {
+  .adm-table { overflow: visible; }
+  .adm-table table,
+  .adm-table tbody { display: block; width: 100%; min-width: 0 !important; }
+  .adm-table thead { display: none; }
+  .adm-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 6px;
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 12px 14px;
+  }
+  .adm-table td { display: block; width: auto; max-width: 100%; padding: 0; }
+  .adm-table td:first-child,
+  .adm-table td:has(input),
+  .adm-table td:has(textarea),
+  .adm-table td.max-w-md { flex: 1 1 100%; }
+  .adm-table td.row-actions { display: none; }
+  .adm-table tr.detail-row { display: block; padding: 0 14px 12px; }
+  .adm-table tr.detail-row td { display: block; width: 100%; }
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

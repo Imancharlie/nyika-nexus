@@ -46,14 +46,14 @@ const OrdersTab = () => {
       <Table head={["Order", "Customer", "Items", "Total", "Payment", "Status", "Placed", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((o) => (
           <Fragment key={o.id}>
-            <tr className="hover:bg-chip/30">
+            <tr className="cursor-pointer hover:bg-chip/30">
               <Td className="font-semibold">{o.code}</Td>
               <Td>
                 <p className="font-medium">{o.customer.name}</p>
                 <p className="text-xs text-muted-foreground">{prettyPhone(o.phone)}</p>
               </Td>
               <Td>
-                <button type="button" onClick={() => setExpanded(expanded === o.id ? null : o.id)} className="text-emerald underline-offset-2 hover:underline">
+                <button type="button" data-view="" onClick={() => setExpanded(expanded === o.id ? null : o.id)} className="text-emerald underline-offset-2 hover:underline">
                   {o.items.length} item{o.items.length === 1 ? "" : "s"}
                 </button>
               </Td>
@@ -63,14 +63,14 @@ const OrdersTab = () => {
                 <Select value={o.status} onChange={(v) => update.mutate({ id: o.id, status: v })} options={ORDER_STATUSES} />
               </Td>
               <Td className="whitespace-nowrap text-muted-foreground">{fmtDate(o.createdAt)}</Td>
-              <Td>
+              <Td className="row-actions">
                 {o.paymentStatus !== "imelipwa" && o.status !== "imeghairiwa" && (
                   <Btn variant="outline" onClick={() => markPaid.mutate(o.id)}>Mark paid</Btn>
                 )}
               </Td>
             </tr>
             {expanded === o.id && (
-              <tr className="bg-chip/30">
+              <tr className="detail-row bg-chip/30">
                 <td colSpan={8} className="px-6 py-3 text-sm">
                   <ul className="space-y-1">
                     {o.items.map((i) => (
@@ -78,6 +78,11 @@ const OrdersTab = () => {
                     ))}
                   </ul>
                   <p className="mt-2 text-muted-foreground">Deliver to: {o.deliveryLocation}{o.notes && ` · Notes: ${o.notes}`}</p>
+                  {o.paymentStatus !== "imelipwa" && o.status !== "imeghairiwa" && (
+                    <div className="mt-3">
+                      <Btn variant="outline" onClick={() => markPaid.mutate(o.id)}>Mark paid</Btn>
+                    </div>
+                  )}
                 </td>
               </tr>
             )}
@@ -113,8 +118,8 @@ const RequestRow = ({ r }: { r: OrderRequest & Customer }) => {
       <Td>
         <Select value={r.status} onChange={(v) => update.mutate({ status: v })} options={REQUEST_STATUSES} />
       </Td>
-      <Td className="min-w-[260px]">
-        <div className="flex gap-2">
+      <Td>
+        <div className="flex min-w-0 flex-wrap gap-2">
           <input value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply to farmer…" className={cn(inputClass, "py-1.5")} />
           <Btn variant="outline" disabled={reply === r.adminReply} onClick={() => update.mutate({ adminReply: reply })}>Send</Btn>
         </div>

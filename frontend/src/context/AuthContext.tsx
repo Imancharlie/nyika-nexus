@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, setAuthLostHandler, tokens } from "@/lib/api";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
 
 export type User = {
@@ -43,6 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(() => Boolean(tokens.get()));
   const queryClient = useQueryClient();
+  const { setLang } = useLanguage();
 
   const logout = useCallback(() => {
     tokens.set(null);
@@ -64,6 +66,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAuthLostHandler(() => setUser(null));
     if (tokens.get()) refreshUser().finally(() => setLoading(false));
   }, [refreshUser]);
+
+  useEffect(() => {
+    if (user?.language === "sw" || user?.language === "en") setLang(user.language);
+  }, [user?.language, setLang]);
 
   const acceptAuth = useCallback(
     (payload: AuthPayload) => {

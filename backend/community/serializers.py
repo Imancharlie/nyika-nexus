@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserSerializer
-from common.fields import ImageUrlField, sw_timesince
+from common.fields import ImageUrlField, media_url, sw_timesince
 
 from .models import Comment, Group, Post
 
@@ -12,13 +12,14 @@ def _avatar(user, context):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source="author.full_name", read_only=True)
+    authorId = serializers.IntegerField(source="author_id", read_only=True)
     avatar = serializers.SerializerMethodField()
     time = serializers.SerializerMethodField()
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
 
     class Meta:
         model = Comment
-        fields = ["id", "author", "avatar", "text", "time", "createdAt"]
+        fields = ["id", "author", "authorId", "avatar", "text", "time", "createdAt"]
 
     def get_avatar(self, obj):
         return _avatar(obj.author, self.context)
@@ -36,6 +37,8 @@ class PostSerializer(serializers.ModelSerializer):
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
     image = ImageUrlField()
     imageFile = serializers.ImageField(source="image_file", write_only=True, required=False, allow_null=True)
+    video = serializers.SerializerMethodField()
+    videoFile = serializers.FileField(source="video_file", write_only=True, required=False, allow_null=True)
     likes = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
@@ -46,7 +49,22 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ["id", "author", "authorId", "avatar", "location", "time", "createdAt", "text", "image", "imageFile",
-                  "likes", "liked", "saved", "comments", "groupId"]
+                  "video", "videoFile", "likes", "liked", "saved", "comments", "groupId"]
+
+    def get_video(self, obj):
+        return media_url(self.context.get("request"), obj.video_file) or None
+
+    def validate_videoFile(self, value):
+        if not value:
+            return value
+        kind = getattr(value, "content_type", "") or ""
+        name = (getattr(value, "name", "") or "").lower()
+        allowed = kind in {"video/mp4", "video/webm", "video/quicktime"} or name.endswith((".mp4", ".webm", ".mov"))
+        if not allowed:
+            raise serializers.ValidationError("Video inaruhusiwa: mp4, webm, au mov.")
+        if value.size > 30 * 1024 * 1024:
+            raise serializers.ValidationError("Video ni kubwa sana. Kikomo ni MB 30.")
+        return value
 
     def get_avatar(self, obj):
         return _avatar(obj.author, self.context)

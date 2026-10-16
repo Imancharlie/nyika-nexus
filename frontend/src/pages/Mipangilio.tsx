@@ -5,8 +5,8 @@ import PageHeader from "@/components/PageHeader";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LanguageSwitch } from "@/components/auth/AuthShell";
 import { useAuth, type AuthPayload, type User } from "@/context/AuthContext";
+import type { Lang } from "@/i18n/LanguageContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { api, ApiError, prettyPhone } from "@/lib/api";
 import { TZ_REGIONS } from "@/lib/regions";
@@ -45,6 +45,20 @@ const Mipangilio = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "" });
   const [savingPassword, setSavingPassword] = useState(false);
+  const [savingLang, setSavingLang] = useState(false);
+
+  const pickLanguage = async (next: Lang) => {
+    if (!user || next === user.language || savingLang) return;
+    setSavingLang(true);
+    try {
+      setUser(await api.patch<User>("/auth/me/", { language: next }));
+      toast.success(t("set.saved"));
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : t("set.save_failed"));
+    } finally {
+      setSavingLang(false);
+    }
+  };
 
   if (!user) return null;
 
@@ -125,7 +139,24 @@ const Mipangilio = () => {
             <p className="text-sm font-medium">{t("set.language")}</p>
             <p className="text-xs text-muted-foreground">Kiswahili · English</p>
           </div>
-          <LanguageSwitch />
+          <div className="flex rounded-full border border-border bg-white p-[3px]" role="group" aria-label={t("set.language")}>
+            {(["sw", "en"] as const).map((code) => (
+              <button
+                key={code}
+                type="button"
+                disabled={savingLang}
+                aria-pressed={user.language === code}
+                onClick={() => pickLanguage(code)}
+                className={
+                  user.language === code
+                    ? "min-h-[34px] min-w-[40px] rounded-full bg-forest text-[13px] font-semibold text-white"
+                    : "min-h-[34px] min-w-[40px] rounded-full text-[13px] font-semibold text-muted-foreground"
+                }
+              >
+                {code.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex items-center gap-3 px-4 py-3.5">
           <Phone className="h-5 w-5 text-primary" />

@@ -27,6 +27,7 @@ import Jifunze from "@/pages/Jifunze";
 import LearningDetails from "@/pages/LearningDetails";
 import Mikopo from "@/pages/Mikopo";
 import Wasifu from "@/pages/Wasifu";
+import Watu from "@/pages/Watu";
 import Mipangilio from "@/pages/Mipangilio";
 import Notifications from "@/pages/Notifications";
 import Search from "@/pages/Search";
@@ -113,6 +114,7 @@ const App = () => (
                     <Route path="/msaada" element={<Msaada />} />
                     <Route path="/msaada/:id" element={<TicketDetail />} />
                     <Route path="/wasifu" element={<Wasifu />} />
+                    <Route path="/watu/:id" element={<Watu />} />
                     <Route path="/mipangilio" element={<Mipangilio />} />
                     <Route path="/taarifa" element={<Notifications />} />
                     <Route path="/utafutaji" element={<Search />} />

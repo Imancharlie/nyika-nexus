@@ -43,6 +43,7 @@ export type ServiceRequest = {
 export type PostComment = {
   id: number;
   author: string;
+  authorId: number;
   avatar: string;
   text: string;
   time: string;
@@ -59,6 +60,7 @@ export type Post = {
   createdAt: string;
   text: string;
   image?: string | null;
+  video?: string | null;
   likes: number;
   liked: boolean;
   saved: boolean;

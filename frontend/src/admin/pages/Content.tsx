@@ -76,13 +76,13 @@ const ArticlesTab = () => {
       <div className="mb-4 flex justify-end"><Btn onClick={() => setEditing(blank())}><Plus className="h-4 w-4" /> New article</Btn></div>
       <Table head={["Article", "Category", "Author", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((a) => (
-          <tr key={a.id} className="hover:bg-chip/30">
+          <tr key={a.id} className="cursor-pointer hover:bg-chip/30">
             <Td><p className="font-semibold">{a.title}</p><p className="line-clamp-1 text-xs text-muted-foreground">{a.description}</p></Td>
             <Td>{categories.find((c) => c.id === a.categoryId)?.name ?? a.categoryId}</Td>
             <Td>{a.author}</Td>
-            <Td>
+            <Td className="row-actions">
               <div className="flex gap-1">
-                <Btn variant="ghost" onClick={() => setEditing({ isNew: false, id: a.id, title: a.title, categoryId: a.categoryId, description: a.description, readTime: a.readTime, imageUrl: a.image ?? "", author: a.author, sections: sectionsToText(a.sections), actions: listToLines(a.actions), expertTip: a.expertTip ?? "" })}><Pencil className="h-4 w-4" /></Btn>
+                <Btn view variant="ghost" onClick={() => setEditing({ isNew: false, id: a.id, title: a.title, categoryId: a.categoryId, description: a.description, readTime: a.readTime, imageUrl: a.image ?? "", author: a.author, sections: sectionsToText(a.sections), actions: listToLines(a.actions), expertTip: a.expertTip ?? "" })}><Pencil className="h-4 w-4" /></Btn>
                 <Btn variant="ghost" onClick={() => confirm(`Delete "${a.title}"?`) && remove.mutate(a.id)}><Trash2 className="h-4 w-4" /></Btn>
               </div>
             </Td>
@@ -91,6 +91,9 @@ const ArticlesTab = () => {
       </Table>
       <Editor title={editing?.isNew ? "New article" : "Edit article"} open={!!editing} onClose={() => setEditing(null)}>
         {editing && <ArticleForm draft={editing} categories={categories} onDone={() => setEditing(null)} />}
+        {editing && !editing.isNew && (
+          <Btn variant="danger" className="mt-3" onClick={() => { if (!confirm(`Delete "${editing.title}"?`)) return; remove.mutate(editing.id); setEditing(null); }}>Delete article</Btn>
+        )}
       </Editor>
     </>
   );
@@ -136,13 +139,13 @@ const ExpertsTab = () => {
       </div>
       <Table head={["Expert", "Location", "Phone", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((x) => (
-          <tr key={x.id} className="hover:bg-chip/30">
+          <tr key={x.id} className="cursor-pointer hover:bg-chip/30">
             <Td><div className="flex items-center gap-3"><img src={x.avatar} alt="" className="h-9 w-9 rounded-full bg-chip" /><div><p className="font-semibold">{x.name}</p><p className="text-xs text-muted-foreground">{x.title}</p></div></div></Td>
             <Td>{x.location}</Td>
             <Td>{x.phone}</Td>
-            <Td>
+            <Td className="row-actions">
               <div className="flex gap-1">
-                <Btn variant="ghost" onClick={() => setEditing({ ...x, specialties: listToLines(x.specialties), isNew: false })}><Pencil className="h-4 w-4" /></Btn>
+                <Btn view variant="ghost" onClick={() => setEditing({ ...x, specialties: listToLines(x.specialties), isNew: false })}><Pencil className="h-4 w-4" /></Btn>
                 <Btn variant="ghost" onClick={() => confirm(`Remove ${x.name}?`) && remove.mutate(x.id)}><Trash2 className="h-4 w-4" /></Btn>
               </div>
             </Td>
@@ -151,6 +154,9 @@ const ExpertsTab = () => {
       </Table>
       <Editor title={editing?.isNew ? "New expert" : "Edit expert"} open={!!editing} onClose={() => setEditing(null)}>
         {editing && <ExpertForm draft={editing} onDone={() => setEditing(null)} />}
+        {editing && !editing.isNew && (
+          <Btn variant="danger" className="mt-3" onClick={() => { if (!confirm(`Remove ${editing.name}?`)) return; remove.mutate(editing.id); setEditing(null); }}>Remove expert</Btn>
+        )}
       </Editor>
     </>
   );
@@ -197,13 +203,13 @@ const LoansTab = () => {
       </div>
       <Table head={["Institution", "Type", "Amount", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((l) => (
-          <tr key={l.id} className="hover:bg-chip/30">
+          <tr key={l.id} className="cursor-pointer hover:bg-chip/30">
             <Td className="font-semibold">{l.institution}</Td>
             <Td>{l.loanType}</Td>
             <Td>{l.amount}</Td>
-            <Td>
+            <Td className="row-actions">
               <div className="flex gap-1">
-                <Btn variant="ghost" onClick={() => setEditing({ ...l, requirements: listToLines(l.requirements), isNew: false })}><Pencil className="h-4 w-4" /></Btn>
+                <Btn view variant="ghost" onClick={() => setEditing({ ...l, requirements: listToLines(l.requirements), isNew: false })}><Pencil className="h-4 w-4" /></Btn>
                 <Btn variant="ghost" onClick={() => confirm(`Remove ${l.institution}?`) && remove.mutate(l.id)}><Trash2 className="h-4 w-4" /></Btn>
               </div>
             </Td>
@@ -212,6 +218,9 @@ const LoansTab = () => {
       </Table>
       <Editor title={editing?.isNew ? "New loan" : "Edit loan"} open={!!editing} onClose={() => setEditing(null)}>
         {editing && <LoanForm draft={editing} onDone={() => setEditing(null)} />}
+        {editing && !editing.isNew && (
+          <Btn variant="danger" className="mt-3" onClick={() => { if (!confirm(`Remove ${editing.institution}?`)) return; remove.mutate(editing.id); setEditing(null); }}>Remove loan</Btn>
+        )}
       </Editor>
     </>
   );
@@ -220,20 +229,35 @@ const LoansTab = () => {
 // ---------- groups ----------
 const GroupsTab = () => {
   const { data, isLoading } = useAdminList<Group>("/admin/groups/");
+  const [open, setOpen] = useState<Group | null>(null);
   const update = useAdminMutation(({ id, active }: { id: number; active: boolean }) => adminApi.patch(`/admin/groups/${id}/`, { active }), "Group updated");
   const remove = useAdminMutation((id: number) => adminApi.delete(`/admin/groups/${id}/`), "Group deleted");
   return (
+    <>
     <Table head={["Group", "Region", "Members", "Visible", ""]} loading={isLoading} empty={!data?.results.length}>
       {data?.results.map((g) => (
-        <tr key={g.id} className="hover:bg-chip/30">
+        <tr key={g.id} className="cursor-pointer hover:bg-chip/30">
           <Td><p className="font-semibold">{g.name}</p><p className="line-clamp-1 text-xs text-muted-foreground">{g.description}</p></Td>
           <Td>{g.region || "—"}</Td>
           <Td className="tabular-nums">{g.membersCount}</Td>
           <Td><Switch checked={g.active} onCheckedChange={(v) => update.mutate({ id: g.id, active: v })} /></Td>
-          <Td><Btn variant="ghost" onClick={() => confirm(`Delete ${g.name} and all its posts?`) && remove.mutate(g.id)}><Trash2 className="h-4 w-4" /></Btn></Td>
+          <Td className="row-actions"><Btn view variant="ghost" onClick={() => setOpen(g)}>View</Btn></Td>
         </tr>
       ))}
     </Table>
+    <Dialog open={!!open} onOpenChange={(v) => !v && setOpen(null)}>
+      <DialogContent className="max-w-sm rounded-3xl">
+        <DialogHeader><DialogTitle>{open?.name}</DialogTitle></DialogHeader>
+        {open && (
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">{open.description}</p>
+            <p>{open.region || "—"} · {open.membersCount} members</p>
+            <Btn variant="danger" onClick={() => { if (!confirm(`Delete ${open.name} and all its posts?`)) return; remove.mutate(open.id); setOpen(null); }}>Delete group</Btn>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 
@@ -242,6 +266,7 @@ type AdminPost = { id: number; author: { name: string; phone: string }; text: st
 
 const PostsTab = () => {
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState<AdminPost | null>(null);
   const { data, isLoading } = useAdminList<AdminPost>("/admin/posts/", { search });
   const update = useAdminMutation(({ id, hidden }: { id: number; hidden: boolean }) => adminApi.patch(`/admin/posts/${id}/`, { hidden }), "Post updated");
   const remove = useAdminMutation((id: number) => adminApi.delete(`/admin/posts/${id}/`), "Post deleted");
@@ -250,7 +275,7 @@ const PostsTab = () => {
       <div className="mb-4"><SearchBox value={search} onChange={setSearch} placeholder="Search post text or author" /></div>
       <Table head={["Post", "Author", "Engagement", "Posted", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((p) => (
-          <tr key={p.id} className={cn("hover:bg-chip/30", p.hidden && "opacity-60")}>
+          <tr key={p.id} className={cn("cursor-pointer hover:bg-chip/30", p.hidden && "opacity-60")}>
             <Td className="max-w-md">
               <p className="line-clamp-2">{p.text}</p>
               <div className="mt-1 flex gap-1">{p.groupName && <Pill tone="blue">{p.groupName}</Pill>}{p.hidden && <Pill tone="red">hidden</Pill>}</div>
@@ -258,15 +283,27 @@ const PostsTab = () => {
             <Td>{p.author.name}</Td>
             <Td className="whitespace-nowrap text-muted-foreground">❤ {p.likes} · 💬 {p.commentsCount}</Td>
             <Td className="whitespace-nowrap text-muted-foreground">{fmtDate(p.createdAt)}</Td>
-            <Td>
-              <div className="flex gap-1">
-                <Btn variant="ghost" onClick={() => update.mutate({ id: p.id, hidden: !p.hidden })}>{p.hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}</Btn>
-                <Btn variant="ghost" onClick={() => confirm("Delete this post?") && remove.mutate(p.id)}><Trash2 className="h-4 w-4" /></Btn>
-              </div>
+            <Td className="row-actions">
+              <Btn view variant="ghost" onClick={() => setOpen(p)}>View</Btn>
             </Td>
           </tr>
         ))}
       </Table>
+      <Dialog open={!!open} onOpenChange={(v) => !v && setOpen(null)}>
+        <DialogContent className="max-w-md rounded-3xl">
+          <DialogHeader><DialogTitle>{open?.author.name}</DialogTitle></DialogHeader>
+          {open && (
+            <div className="space-y-3 text-sm">
+              <p className="whitespace-pre-line">{open.text}</p>
+              <p className="text-muted-foreground">{open.likes} likes · {open.commentsCount} comments{open.groupName ? ` · ${open.groupName}` : ""}</p>
+              <div className="flex flex-wrap gap-2">
+                <Btn variant="outline" onClick={() => { update.mutate({ id: open.id, hidden: !open.hidden }); setOpen(null); }}>{open.hidden ? "Show post" : "Hide post"}</Btn>
+                <Btn variant="danger" onClick={() => { if (!confirm("Delete this post?")) return; remove.mutate(open.id); setOpen(null); }}>Delete</Btn>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

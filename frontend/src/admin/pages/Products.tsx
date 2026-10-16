@@ -103,7 +103,7 @@ const Products = () => {
       </div>
       <Table head={["Product", "Category", "Price", "Stock", "Status", ""]} loading={isLoading} empty={!data?.results.length}>
         {data?.results.map((p) => (
-          <tr key={p.id} className="hover:bg-chip/30">
+          <tr key={p.id} className="cursor-pointer hover:bg-chip/30">
             <Td>
               <div className="flex items-center gap-3">
                 {p.image ? <img src={p.image} alt="" className="h-11 w-11 rounded-xl object-cover" /> : <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-chip"><Package className="h-5 w-5 text-emerald" /></span>}
@@ -120,9 +120,9 @@ const Products = () => {
               {p.active ? <Pill tone="green">visible</Pill> : <Pill>hidden</Pill>}
               {p.featured && <Pill tone="blue">featured</Pill>}
             </Td>
-            <Td>
+            <Td className="row-actions">
               <div className="flex gap-1">
-                <Btn variant="ghost" onClick={() => edit(p)}><Pencil className="h-4 w-4" /></Btn>
+                <Btn view variant="ghost" onClick={() => edit(p)}><Pencil className="h-4 w-4" /></Btn>
                 <Btn variant="ghost" onClick={() => confirm(`Delete ${p.name}?`) && remove.mutate(p.id)}><Trash2 className="h-4 w-4" /></Btn>
               </div>
             </Td>
@@ -134,6 +134,9 @@ const Products = () => {
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl">
           <DialogHeader><DialogTitle>{editing?.id ? "Edit product" : "New product"}</DialogTitle></DialogHeader>
           {editing && <ProductForm draft={editing} onDone={() => setEditing(null)} />}
+          {editing?.id && (
+            <Btn variant="danger" className="mt-3" onClick={() => { if (!confirm(`Delete ${editing.name}?`)) return; remove.mutate(editing.id!); setEditing(null); }}>Delete product</Btn>
+          )}
         </DialogContent>
       </Dialog>
     </div>

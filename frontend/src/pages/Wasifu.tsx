@@ -1,38 +1,178 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import ImagePreview from "@/components/ImagePreview";
 import {
   Bell,
   Bookmark,
   ChevronRight,
   ClipboardList,
+  Heart,
   LifeBuoy,
   ListOrdered,
   LogOut,
-  MapPin,
+  MessageCircle,
+  MoreHorizontal,
   PenSquare,
   Phone,
+  Send,
   Settings,
   ShoppingCart,
   Sprout,
+  Trash2,
   Users,
   Wallet,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatusBadge from "@/components/StatusBadge";
-import LearningCard from "@/components/LearningCard";
-import { formatDate, formatTZS, timeAgo } from "@/lib/utils";
+import { cn, formatDate, formatTZS, timeAgo } from "@/lib/utils";
 import { prettyPhone } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
+import type { Post } from "@/types";
 import {
-  useArticles,
   useConsultations,
+  usePostActions,
   usePosts,
   useServiceRequests,
-  useToggleSaveArticle,
   useUnreadCount,
 } from "@/hooks/useApi";
+
+const ProfilePost = ({ post }: { post: Post }) => {
+  const { t, lang } = useLanguage();
+  const { user } = useAuth();
+  const { like, comment, remove, removeComment } = usePostActions();
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [liked, setLiked] = useState(post.liked);
+  const [likes, setLikes] = useState(post.likes);
+
+  useEffect(() => {
+    setLiked(post.liked);
+    setLikes(post.likes);
+  }, [post.id, post.liked, post.likes]);
+
+  const tapLike = () => {
+    setLiked((value) => {
+      setLikes((count) => count + (value ? -1 : 1));
+      return !value;
+    });
+    like.mutate(post.id);
+  };
+
+  const send = () => {
+    const body = text.trim();
+    if (!body) return;
+    comment.mutate({ id: post.id, text: body });
+    setText("");
+    setOpen(true);
+  };
+
+  return (
+    <article className="rounded-2xl border border-border/70 bg-card p-4">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs text-muted-foreground">{timeAgo(post.createdAt, lang)}</p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground">
+              <MoreHorizontal className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => {
+                if (!window.confirm(t("c.delete_post_q"))) return;
+                remove.mutate(post.id);
+              }}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t("c.delete_post")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <p className="mt-1 whitespace-pre-line text-sm">{post.text}</p>
+      {post.image && (
+        <ImagePreview src={post.image} className="mt-2 max-h-60 w-full rounded-xl object-cover" />
+      )}
+      {post.video && (
+        <video src={post.video} controls playsInline className="mt-2 max-h-60 w-full rounded-xl bg-black" />
+      )}
+      <div className="mt-3 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={tapLike}
+          className={cn("inline-flex items-center gap-1.5 text-base font-semibold", liked ? "text-red-500" : "text-foreground")}
+        >
+          <Heart className={cn("h-7 w-7", liked && "fill-current")} />
+          {likes}
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className="inline-flex items-center gap-1.5 text-base font-semibold"
+        >
+          <MessageCircle className="h-7 w-7" />
+          {post.comments.length}
+        </button>
+      </div>
+      {open && (
+        <div className="mt-3 space-y-3 border-t pt-3">
+          {post.comments.length === 0 && (
+            <p className="text-sm text-muted-foreground">{t("c.no_comments")}</p>
+          )}
+          {post.comments.map((item) => (
+            <div key={item.id} className="flex gap-2">
+              <Avatar className="h-8 w-8 border">
+                <AvatarImage src={item.avatar} alt={item.author} />
+                <AvatarFallback>{item.author.slice(0, 2)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm">
+                  <span className="font-semibold">{item.author}</span> {item.text}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {item.createdAt ? timeAgo(item.createdAt, lang) : item.time}
+                  {user?.id === item.authorId && (
+                    <button
+                      type="button"
+                      className="ml-3 font-semibold text-destructive"
+                      onClick={() => removeComment.mutate({ postId: post.id, commentId: item.id })}
+                    >
+                      {t("c.delete_comment")}
+                    </button>
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
+          <div className="flex gap-2">
+            <Input
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={(event) => event.key === "Enter" && send()}
+              placeholder={t("c.comment_ph")}
+              className="rounded-full"
+            />
+            <Button size="icon" className="h-10 w-10 shrink-0 rounded-full" onClick={send} disabled={!text.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+};
 
 const Wasifu = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,14 +183,13 @@ const Wasifu = () => {
   const { data: myPosts = [] } = usePosts({ mine: true });
   const { data: serviceRequests = [] } = useServiceRequests();
   const { data: consultations = [] } = useConsultations();
-  const { data: articles = [] } = useArticles();
-  const toggleSave = useToggleSaveArticle();
-  const toggleSaveArticle = (id: string) => toggleSave.mutate(id);
   const unreadCount = useUnreadCount();
-
-  const savedArticles = articles.filter((article) => article.saved);
+  const activeTab = tab === "huduma" || tab === "ushauri" ? tab : "machapisho";
 
   const changeTab = (value: string) => setSearchParams({ tab: value });
+  const showActions = () => {
+    document.getElementById("profile-actions")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const signOut = () => {
     logout();
@@ -72,11 +211,6 @@ const Wasifu = () => {
         <p className="mt-1 flex items-center justify-center gap-1 text-sm text-muted-foreground">
           <Phone className="h-3.5 w-3.5" /> {prettyPhone(user.phone)}
         </p>
-        {(user.location || user.region) && (
-          <p className="mt-0.5 flex items-center justify-center gap-1 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" /> {[user.location, user.region].filter(Boolean).join(", ")}
-          </p>
-        )}
         {user.region && (
           <Badge variant="outline" className="mt-3 border-primary/40 text-primary">
             <Sprout className="mr-1 h-3.5 w-3.5" /> {t("prof.region")} {user.region}
@@ -84,12 +218,20 @@ const Wasifu = () => {
         )}
       </section>
 
-      <Tabs value={tab} onValueChange={changeTab}>
+      <Tabs value={activeTab} onValueChange={changeTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="machapisho" className="px-1 text-xs">{t("prof.tab_posts")}</TabsTrigger>
+          <TabsTrigger value="machapisho" className="px-1 text-xs">
+            {t("prof.tab_posts")}{myPosts.length > 1 ? ` (${myPosts.length})` : ""}
+          </TabsTrigger>
           <TabsTrigger value="huduma" className="px-1 text-xs">{t("prof.tab_services")}</TabsTrigger>
           <TabsTrigger value="ushauri" className="px-1 text-xs">{t("prof.tab_advice")}</TabsTrigger>
-          <TabsTrigger value="mafunzo" className="px-1 text-xs">{t("prof.tab_learning")}</TabsTrigger>
+          <button
+            type="button"
+            onClick={showActions}
+            className="inline-flex items-center justify-center rounded-sm px-1 py-1.5 text-xs font-medium text-muted-foreground"
+          >
+            {t("prof.tab_more")}
+          </button>
         </TabsList>
 
         <TabsContent value="machapisho" className="mt-4 space-y-4">
@@ -106,25 +248,7 @@ const Wasifu = () => {
               }
             />
           ) : (
-            myPosts.map((post) => (
-              <article
-                key={post.id}
-                className="rounded-2xl border border-border/70 bg-card p-4"
-              >
-                <p className="text-xs text-muted-foreground">{timeAgo(post.createdAt, lang)}</p>
-                <p className="mt-1 whitespace-pre-line text-sm">{post.text}</p>
-                {post.image && (
-                  <img
-                    src={post.image}
-                    alt=""
-                    className="mt-2 max-h-60 w-full rounded-xl object-cover"
-                  />
-                )}
-                <p className="mt-2 text-xs font-medium text-muted-foreground">
-                  ❤️ {post.likes} · 💬 {post.comments.length}
-                </p>
-              </article>
-            ))
+            myPosts.map((post) => <ProfilePost key={post.id} post={post} />)
           )}
         </TabsContent>
 
@@ -204,34 +328,13 @@ const Wasifu = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="mafunzo" className="mt-4 space-y-3">
-          {savedArticles.length === 0 ? (
-            <EmptyState
-              text={t("prof.no_saved")}
-              action={
-                <Link
-                  to="/jifunze"
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-                >
-                  {t("prof.go_learn")}
-                </Link>
-              }
-            />
-          ) : (
-            savedArticles.map((article) => (
-              <LearningCard
-                key={article.id}
-                article={article}
-                saved
-                onSave={() => toggleSaveArticle(article.id)}
-              />
-            ))
-          )}
-        </TabsContent>
       </Tabs>
 
-      {/* Menu */}
-      <section className="overflow-hidden rounded-2xl border border-border/70 bg-card">
+      <section
+        id="profile-actions"
+        className="overflow-hidden rounded-2xl border border-border/70 bg-card"
+        style={{ scrollMarginTop: 88, scrollMarginBottom: 120 }}
+      >
         <MenuLink to="/taarifa" icon={<Bell className="h-5 w-5" />} label={t("notif.title")}>
           {unreadCount > 0 && (
             <Badge className="mr-2 bg-destructive text-destructive-foreground">

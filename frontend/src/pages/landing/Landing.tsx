@@ -32,6 +32,7 @@ const Sprite = () => (
     <symbol id="i-eye" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24" strokeLinecap="round"><path d="M4 8h16M4 16h16" /></symbol>
     <symbol id="i-x" viewBox="0 0 24 24" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M6 11l6-6 6 6" /></symbol>
   </svg>
 );
 
@@ -107,7 +108,7 @@ const HowItWorks = () => {
   ] as const;
 
   return (
-    <section className="light" id="jinsi" style={{ padding: "70px 0 100px" }} ref={secRef}>
+    <section className="light how-sec" id="jinsi" ref={secRef}>
       <div className="wrap how">
         <div>
           <div className="sec-head">
@@ -135,6 +136,7 @@ const HowItWorks = () => {
         </div>
         <div className="stage">
           <svg className="bgsw" viewBox="0 0 400 160" preserveAspectRatio="none" aria-hidden="true"><path d="M0 160V90C70 50 150 36 240 50 150 62 80 104 40 160Z" fill="#C8F169" opacity=".5" /><path d="M60 160C120 90 230 52 360 40 270 72 200 116 160 160Z" fill="#fff" opacity=".35" /><path d="M220 160C270 106 330 72 400 62V160Z" fill="#C8F169" opacity=".45" /></svg>
+          <div className="phone-fit">
           <div className={`phone${paid ? " paid" : ""}`} aria-hidden="true">
             <div className={`screen${cur === 0 ? " on" : ""}`}>
               <div className="ph-logo"><img src="/brand/mark-color.png" alt="" /><span>AGRIMIKA</span></div>
@@ -167,6 +169,10 @@ const HowItWorks = () => {
               <div className="ph-pay"><span className="a">{lt("ph_pay")}</span><span className="b"><Icon id="check" /><span>{lt("paid")}</span></span></div>
             </div>
           </div>
+          </div>
+        </div>
+        <div className="sec-cta">
+          <Link className="btn btn-solid" to="/jisajili"><span>{lt("cta_btn")}</span><Icon id="arrow" /></Link>
         </div>
       </div>
     </section>
@@ -197,9 +203,10 @@ const POSTS = [
 ] as const;
 
 const Landing = () => {
-  const { lt } = useLanguage();
+  const { lt, lang } = useLanguage();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [showTop, setShowTop] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState<{ kind: "err"; text: string } | null>(null);
@@ -209,12 +216,24 @@ const Landing = () => {
   const hintRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    document.title = "AGRIMIKA — Kilimo ni Maisha";
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const title = lang === "en"
+      ? "AGRIMIKA — Farming is Life | A platform for farmers in Tanzania"
+      : "AGRIMIKA — Kilimo ni Maisha | Jukwaa la Wakulima Tanzania";
+    const description = lang === "en"
+      ? "AGRIMIKA helps farmers in Tanzania learn better farming, buy and sell produce, and join farming groups. One free platform, on your phone."
+      : "AGRIMIKA inasaidia wakulima Tanzania kujifunza kilimo bora, kununua na kuuza mazao, na kujiunga na vikundi. Jukwaa bure, kwa simu yako.";
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+      setShowTop(window.scrollY > 400);
+    };
     addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => removeEventListener("scroll", onScroll);
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     if (!heroRef.current || !sceneRef.current || !droneRef.current) return;
@@ -269,7 +288,7 @@ const Landing = () => {
           <a href="#jinsi" onClick={closeMenu}>{lt("n_how")}</a>
           <a href="#jamii" onClick={closeMenu}>{lt("n_comm")}</a>
           <Link to="/ingia">{lt("n_login")}</Link>
-          <Link className="btn btn-solid" to="/jisajili">{lt("n_signup")}</Link>
+          <Link className="btn btn-solid" to="/jisajili">{lt("cta_btn")}</Link>
         </div>
       </header>
 
@@ -376,6 +395,9 @@ const Landing = () => {
                 </div>
               </article>
             </div>
+            <div className="sec-cta">
+              <Link className="btn btn-solid" to="/jisajili"><span>{lt("cta_btn")}</span><Icon id="arrow" /></Link>
+            </div>
           </div>
         </section>
 
@@ -409,6 +431,9 @@ const Landing = () => {
                   </div>
                 </article>
               ))}
+            </div>
+            <div className="sec-cta">
+              <Link className="btn btn-solid" to="/jisajili"><span>{lt("cta_btn")}</span><Icon id="arrow" /></Link>
             </div>
           </div>
         </section>
@@ -486,6 +511,20 @@ const Landing = () => {
           <div className="foot-bottom">{lt("f_copy")}</div>
         </div>
       </footer>
+
+      <button
+        className={`to-top${showTop ? " show" : ""}`}
+        type="button"
+        aria-label={lt("to_top")}
+        aria-hidden={!showTop}
+        tabIndex={showTop ? 0 : -1}
+        onClick={() => {
+          const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+          document.getElementById("top")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+        }}
+      >
+        <Icon id="up" />
+      </button>
     </div>
   );
 };

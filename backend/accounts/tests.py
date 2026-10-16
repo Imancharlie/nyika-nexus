@@ -45,6 +45,12 @@ class AuthFlowTests(TestCase):
         self.assertEqual(r.status_code, 201, r.content)
         self.assertIn("access", r.data)
         self.assertEqual(r.data["user"]["phone"], "+255712345678")
+        self.assertEqual(r.data["user"]["language"], "sw")
+        en = self.client.post("/api/auth/register/", {
+            **SIGNUP, "username": "asha_m", "phone": "0712 345 679", "language": "en",
+        }, format="json")
+        self.assertEqual(en.status_code, 201, en.content)
+        self.assertEqual(en.data["user"]["language"], "en")
 
     def test_register_validation(self):
         bad = {**SIGNUP, "passwordConfirm": "nope", "phone": "0812"}

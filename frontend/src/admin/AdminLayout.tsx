@@ -60,7 +60,7 @@ const AdminLayout = () => {
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium transition-colors",
                 isActive ? "bg-white text-forest" : "text-white/75 hover:bg-white/10 hover:text-white",
               )
             }
@@ -77,7 +77,7 @@ const AdminLayout = () => {
   );
 
   const sidebar = (
-    <div className="flex h-full flex-col gap-6 p-5">
+    <div className="flex h-full flex-col gap-3 p-4">
       <Link to="/admin" className="flex items-center gap-2.5">
         <img src="/brand/mark-light.png" alt="" className="h-9 w-auto" />
         <div>

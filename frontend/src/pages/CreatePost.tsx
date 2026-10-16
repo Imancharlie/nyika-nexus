@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ImagePlus, PenLine, Send, Video, X } from "lucide-react";
+import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -30,13 +31,14 @@ const CreatePost = () => {
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | undefined>();
   const [imageFile, setImageFile] = useState<File | undefined>();
+  const [video, setVideo] = useState<string | undefined>();
+  const [videoFile, setVideoFile] = useState<File | undefined>();
   const [error, setError] = useState<string | null>(null);
 
   const selectMode = (next: (typeof modes)[number]["id"]) => {
     setMode(next);
     if (next === "video") {
-      toast.info(t("post.video_soon"));
-      setMode("andika");
+      document.getElementById("post-video-input")?.click();
       return;
     }
     if (next === "picha") {
@@ -51,15 +53,23 @@ const CreatePost = () => {
     setMode("picha");
   };
 
+  const pickVideo = (file?: File) => {
+    if (!file) return;
+    setVideoFile(file);
+    setVideo(URL.createObjectURL(file));
+    setMode("video");
+  };
+
   const publish = async (event: FormEvent) => {
     event.preventDefault();
-    if (!text.trim() && !imageFile) {
+    if (!text.trim() && !imageFile && !videoFile) {
       setError(t("post.err_empty"));
       return;
     }
     const body = new FormData();
-    body.append("text", text.trim() || "📸 Picha yangu ya shamba");
+    body.append("text", text.trim() || (videoFile ? "🎬 Video yangu ya shamba" : "📸 Picha yangu ya shamba"));
     if (imageFile) body.append("imageFile", imageFile);
+    if (videoFile) body.append("videoFile", videoFile);
     if (groupId) body.append("groupId", groupId);
     try {
       await createPost.mutateAsync(body);
@@ -125,20 +135,41 @@ const CreatePost = () => {
             className="hidden"
             onChange={(event) => pickImage(event.target.files?.[0])}
           />
+          <input
+            id="post-video-input"
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            className="hidden"
+            onChange={(event) => pickVideo(event.target.files?.[0])}
+          />
 
           {image && (
             <div className="relative mt-3">
-              <img
-                src={image}
-                alt=""
-                className="max-h-72 w-full rounded-xl object-cover"
-              />
+              <ImagePreview src={image} className="max-h-72 w-full rounded-xl object-cover" />
               <button
                 type="button"
                 onClick={() => {
                   setImage(undefined);
                   setImageFile(undefined);
                   setMode("andika");
+                }}
+                aria-label={t("cons.remove_photo")}
+                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {video && (
+            <div className="relative mt-3">
+              <video src={video} controls playsInline className="max-h-72 w-full rounded-xl bg-black" />
+              <button
+                type="button"
+                onClick={() => {
+                  setVideo(undefined);
+                  setVideoFile(undefined);
+                  if (!imageFile) setMode("andika");
                 }}
                 aria-label={t("cons.remove_photo")}
                 className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white"

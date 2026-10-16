@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { toast } from "sonner";
+import { api, ApiError } from "@/lib/api";
+import { useLanguage } from "@/i18n/LanguageContext";
 import type {
   AppNotification,
   Consultation,
@@ -60,9 +62,14 @@ export const useArticle = (id?: string) => useItem<LearningArticle>(["articles",
 
 export const useToggleSaveArticle = () => {
   const qc = useQueryClient();
+  const { t } = useLanguage();
   return useMutation({
     mutationFn: (id: string) => api.post<{ saved: boolean }>(`/learning/articles/${id}/save/`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["articles"] }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["articles"] });
+      toast.success(res.saved ? t("c.article_saved") : t("c.article_unsaved"));
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t("toast.fail")),
   });
 };
 
@@ -93,13 +100,33 @@ export const useMarkNotificationRead = () => {
 };
 
 // ---------- community ----------
-export type PostFilter = { group?: number; mine?: boolean; saved?: boolean };
+export type PostFilter = { group?: number; mine?: boolean; saved?: boolean; author?: number };
 
 export const usePosts = (filter: PostFilter = {}) =>
   useList<Post>(["posts"], "/posts/", {
     group: filter.group,
     mine: filter.mine ? 1 : undefined,
     saved: filter.saved ? 1 : undefined,
+    author: filter.author,
+  });
+
+export type PublicProfile = {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  phone: string;
+  region: string;
+  location: string;
+  avatar: string;
+};
+
+export const usePublicUser = (id: number) =>
+  useQuery({
+    queryKey: ["user", id],
+    queryFn: () => api.get<PublicProfile>(`/auth/users/${id}/`),
+    enabled: Number.isFinite(id) && id > 0,
   });
 
 const replacePost = (qc: ReturnType<typeof useQueryClient>, post: Post) => {
@@ -108,12 +135,20 @@ const replacePost = (qc: ReturnType<typeof useQueryClient>, post: Post) => {
 
 export const usePostActions = () => {
   const qc = useQueryClient();
+  const { t } = useLanguage();
   const like = useMutation({
     mutationFn: (id: number) => api.post<Post>(`/posts/${id}/like/`),
-    onMutate: (id) => {
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ["posts"] });
+      const previous = qc.getQueriesData<Post[]>({ queryKey: ["posts"] });
       qc.setQueriesData<Post[]>({ queryKey: ["posts"] }, (old) =>
         old?.map((p) => (p.id === id ? { ...p, liked: !p.liked, likes: p.likes + (p.liked ? -1 : 1) } : p)),
       );
+      return { previous };
+    },
+    onError: (err, _id, context) => {
+      context?.previous.forEach(([key, data]) => qc.setQueryData(key, data));
+      toast.error(err instanceof ApiError ? err.message : t("toast.fail"));
     },
     onSuccess: (post) => replacePost(qc, post),
   });
@@ -122,7 +157,9 @@ export const usePostActions = () => {
     onSuccess: (post) => {
       replacePost(qc, post);
       qc.invalidateQueries({ queryKey: ["posts", { saved: 1 }] });
+      toast.success(post.saved ? t("c.saved") : t("c.unsaved"));
     },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t("toast.fail")),
   });
   const comment = useMutation({
     mutationFn: ({ id, text }: { id: number; text: string }) => api.post<PostComment>(`/posts/${id}/comments/`, { text }),
@@ -130,13 +167,30 @@ export const usePostActions = () => {
       qc.setQueriesData<Post[]>({ queryKey: ["posts"] }, (old) =>
         old?.map((p) => (p.id === id ? { ...p, comments: [...p.comments, c] } : p)),
       );
+      toast.success(t("c.commented"));
     },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t("toast.fail")),
   });
   const remove = useMutation({
     mutationFn: (id: number) => api.delete(`/posts/${id}/`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["posts"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["posts"] });
+      toast.success(t("c.post_deleted"));
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t("toast.fail")),
   });
-  return { like, save, comment, remove };
+  const removeComment = useMutation({
+    mutationFn: ({ postId, commentId }: { postId: number; commentId: number }) =>
+      api.delete(`/posts/${postId}/comments/${commentId}/`),
+    onSuccess: (_data, { postId, commentId }) => {
+      qc.setQueriesData<Post[]>({ queryKey: ["posts"] }, (old) =>
+        old?.map((p) => (p.id === postId ? { ...p, comments: p.comments.filter((c) => c.id !== commentId) } : p)),
+      );
+      toast.success(t("c.comment_deleted"));
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : t("toast.fail")),
+  });
+  return { like, save, comment, remove, removeComment };
 };
 
 export const useCreatePost = () => {
@@ -152,13 +206,24 @@ export const useGroup = (id?: string) => useItem<Group>(["groups", "one", id], `
 
 export const useGroupActions = () => {
   const qc = useQueryClient();
+  const { t } = useLanguage();
   const refresh = () => qc.invalidateQueries({ queryKey: ["groups"] });
+  const fail = (err: unknown) => toast.error(err instanceof ApiError ? err.message : t("toast.fail"));
   return {
-    join: useMutation({ mutationFn: (id: number) => api.post<Group>(`/groups/${id}/join/`), onSuccess: refresh }),
-    leave: useMutation({ mutationFn: (id: number) => api.post<Group>(`/groups/${id}/leave/`), onSuccess: refresh }),
+    join: useMutation({
+      mutationFn: (id: number) => api.post<Group>(`/groups/${id}/join/`),
+      onSuccess: () => { refresh(); toast.success(t("groups.joined_ok")); },
+      onError: fail,
+    }),
+    leave: useMutation({
+      mutationFn: (id: number) => api.post<Group>(`/groups/${id}/leave/`),
+      onSuccess: () => { refresh(); toast.success(t("groups.left_ok")); },
+      onError: fail,
+    }),
     create: useMutation({
       mutationFn: (body: Partial<Group>) => api.post<Group>("/groups/", body),
-      onSuccess: refresh,
+      onSuccess: () => { refresh(); toast.success(t("groups.created")); },
+      onError: fail,
     }),
   };
 };

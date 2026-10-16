@@ -1,6 +1,6 @@
 export const landingT = {
 sw:{
- skip:"Ruka hadi maudhui", menu:"Fungua menyu",
+ skip:"Ruka hadi maudhui", menu:"Fungua menyu", to_top:"Rudi juu",
  n_feat:"Sifa", n_how:"Jinsi inavyofanya kazi", n_comm:"Jamii", n_login:"Ingia", n_signup:"Jisajili",
  h1a:"Shamba lako.", h1b:"Soko lako.", h1c:"Jamii yako.",
  hero_sub:"Jifunze kilimo bora, nunua na uuze mazao, na ungana na wakulima wenzako. Yote kwenye jukwaa moja, kwa simu yako.",
@@ -37,7 +37,7 @@ sw:{
  f_copy:"© 2026 AGRIMIKA. Haki zote zimehifadhiwa."
 },
 en:{
- skip:"Skip to content", menu:"Open menu",
+ skip:"Skip to content", menu:"Open menu", to_top:"Back to top",
  n_feat:"Features", n_how:"How it works", n_comm:"Community", n_login:"Log in", n_signup:"Sign up",
  h1a:"Your farm.", h1b:"Your market.", h1c:"Your community.",
  hero_sub:"Learn better farming, buy and sell produce, and connect with fellow farmers. All in one place, on your phone.",

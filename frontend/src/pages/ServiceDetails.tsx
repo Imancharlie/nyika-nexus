@@ -8,6 +8,7 @@ import {
   PackageCheck,
   Users,
 } from "lucide-react";
+import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
 import QueryState from "@/components/QueryState";
 import NotFound from "./NotFound";
@@ -31,7 +32,7 @@ const ServiceDetails = () => {
       <div className="overflow-hidden rounded-3xl border border-border/70 bg-card">
         {pkg.image && (
           <div className="relative h-44">
-            <img src={pkg.image} alt={pkg.name} className="h-full w-full object-cover" />
+            <ImagePreview src={pkg.image} alt={pkg.name} className="h-full w-full object-cover" />
             <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-primary backdrop-blur">
               {pkg.serviceType}
             </span>

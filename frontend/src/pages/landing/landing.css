@@ -56,6 +56,9 @@ html:has(.lp){scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset
 .lp .menu-btn{display:none;width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;align-items:center;justify-content:center}
 .lp .menu-btn .ic{font-size:22px;stroke-width:2}
 .lp .mobile-panel{display:none}
+.lp .to-top{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;width:48px;height:48px;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:linear-gradient(135deg,#D3F77A 0%,#5FD38A 100%);color:#04210F;box-shadow:0 10px 24px -8px rgba(6,40,24,.45);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.lp .to-top.show{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+.lp .to-top .ic{font-size:22px;stroke-width:2.4}
 
 /* ---------- hero ---------- */
 .lp .hero{position:relative;min-height:max(100svh,720px);background:var(--forest);overflow:hidden;isolation:isolate;touch-action:pan-y;color:#fff;display:flex}
@@ -171,8 +174,10 @@ html:has(.lp){scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset
 .lp .step .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--leaf),var(--lime))}
 @media (prefers-reduced-motion: no-preference){ .lp .step.on .bar i{animation:prog 5.5s linear forwards} @keyframes prog{to{width:100%}} }
 @media (prefers-reduced-motion: reduce){.lp .step.on .bar i{width:100%} }
+.lp .how-sec{padding:70px 0 100px}
 .lp .stage{position:relative;display:grid;place-items:center;padding:48px 20px;border-radius:44px;background:radial-gradient(90% 70% at 50% 0%,#9BE564 0%,#12A05A 38%,#06301A 100%);overflow:hidden}
 .lp .stage svg.bgsw{position:absolute;inset:auto 0 0 0;width:100%;opacity:.35}
+.lp .phone-fit{display:flex;justify-content:center;align-items:flex-start;width:100%}
 .lp .phone{position:relative;width:min(320px,100%);aspect-ratio:9/18.6;border-radius:42px;background:#F6FFF9;border:9px solid #071B10;box-shadow:0 40px 80px -20px rgba(0,25,10,.7), 0 0 0 1px rgba(255,255,255,.18);overflow:hidden;color:#062818;font-size:12px;line-height:1.35}
 .lp .phone::before{content:"";position:absolute;top:8px;left:50%;width:78px;height:20px;margin-left:-39px;border-radius:12px;background:#071B10;z-index:5}
 .lp .screen{position:absolute;inset:0;padding:44px 16px 16px;opacity:0;transform:scale(.97);transition:opacity .45s ease, transform .45s ease;pointer-events:none;display:flex;flex-direction:column;gap:10px}
@@ -217,6 +222,9 @@ html:has(.lp){scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset
 .lp .see-all{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--accent);text-decoration:none;padding:10px 4px}
 .lp .see-all .ic{font-size:18px;stroke-width:2;transition:transform .2s}
 .lp .see-all:hover .ic{transform:translateX(4px)}
+.lp .sec-cta{display:flex;margin-top:28px}
+.lp .sec-cta .btn{min-height:52px}
+.lp .how .sec-cta{grid-column:1/-1;margin-top:8px}
 .lp .posts{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:44px}
 .lp .post{border-radius:26px;background:var(--surface);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column}
 .lp .post .art{height:158px;position:relative}
@@ -278,36 +286,75 @@ html:has(.lp){scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset
 }
 @media (max-width:860px){
   .lp .nav-links,.lp .nav .login,.lp .nav-right .btn{display:none}
+  .lp .nav-right .lang{display:flex}
   .lp .menu-btn{display:inline-flex}
+  .lp .nav-in{gap:10px}
   .lp .mobile-panel{display:none;padding:6px 28px 22px;flex-direction:column;gap:4px;max-width:1240px;margin:0 auto}
   .lp .nav.open .mobile-panel{display:flex}
   .lp .mobile-panel a{color:#fff;text-decoration:none;font-weight:600;font-size:18px;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.1)}
-  .lp .mobile-panel .btn{margin-top:14px;border-bottom:0}
+  .lp .mobile-panel .btn{margin-top:14px;border-bottom:0;min-height:52px;font-size:17px}
   .lp .hint{text-align:left}
+  .lp .how-sec{padding:48px 0 56px}
+  .lp .stage{padding:28px 16px}
+  .lp .phone-fit{--w:min(280px,72vw);--h:calc(var(--w) * 18.6 / 9);--cap:min(50svh,520px);--s:min(1, var(--cap) / var(--h));height:calc(var(--h) * var(--s));overflow:hidden}
+  .lp .phone{width:var(--w);flex:none;transform:scale(var(--s));transform-origin:top center}
 }
 @media (max-width:700px){
-  .lp .bento{grid-template-columns:1fr}
+  .lp .bento{grid-template-columns:1fr;gap:12px}
   .lp .t-learn,.lp .t-shop,.lp .t-req,.lp .t-ord,.lp .t-pay,.lp .t-com{grid-column:1/-1}
-  .lp .tile{padding:24px}
-  .lp .sheet{border-radius:36px 36px 0 0;margin-top:-36px;padding-top:88px}
-  .lp .wrap,.lp .nav-in,.lp .hero-inner{padding-left:20px;padding-right:20px}
-  .lp .hero-inner{padding-top:clamp(300px,44svh,420px);padding-bottom:96px}
+  .lp .tile{padding:18px;gap:12px;border-radius:22px}
+  .lp .tile h3{font-size:20px}
+  .lp .t-learn{padding:20px}
+  .lp .t-learn h3{font-size:24px}
+  .lp .badge{width:40px;height:40px;border-radius:14px;font-size:20px}
+  .lp .vid{height:132px;border-radius:16px}
+  .lp .sec-head{margin-bottom:28px}
+  .lp .sec-head h2{font-size:clamp(30px,8.5vw,40px)}
+  .lp .sec-head p{margin-top:10px;font-size:16px}
+  .lp .sheet{border-radius:28px 28px 0 0;margin-top:-28px;padding:56px 0 24px}
+  .lp .wrap,.lp .hero-inner{padding-left:20px;padding-right:20px}
+  .lp .nav-in{padding:8px 14px;gap:8px;min-height:60px}
+  .lp .nav .brand{gap:6px;min-width:0}
+  .lp .nav .brand .mark{height:28px}
+  .lp .nav .brand .word{display:block;height:12px;width:auto}
+  .lp .hero{min-height:100svh}
+  .lp .hero-inner{padding-top:clamp(108px,18svh,160px);padding-bottom:56px}
+  .lp .h1{font-size:clamp(38px,11vw,52px)}
+  .lp .lead{margin-top:16px;font-size:16px}
+  .lp .cta-row{margin-top:20px}
   .lp .hero-fade{height:72%;background:linear-gradient(to top,rgba(3,22,13,.94) 0%,rgba(3,22,13,.78) 42%,rgba(3,22,13,0) 100%)}
-  .lp .cta-row .btn{flex:1 1 100%}
+  .lp .cta-row .btn{flex:1 1 100%;min-height:52px;white-space:normal;text-align:center;padding:12px 20px}
+  .lp .hero-foot{padding-top:24px}
   .lp .stats{display:grid;grid-template-columns:repeat(3,1fr);width:100%}
-  .lp .stat{flex-direction:column;align-items:flex-start;gap:4px;padding:14px 14px}
+  .lp .stat{flex-direction:column;align-items:flex-start;gap:4px;padding:12px 12px}
   .lp .stat+.stat{border-left:1px solid rgba(255,255,255,.12)}
   .lp .stat .ic{display:none}
-  .lp .stat b{font-size:19px;line-height:1.1}
-  .lp .stat small{font-size:13px;margin-top:2px}
+  .lp .stat b{font-size:18px;line-height:1.1}
+  .lp .stat small{font-size:12px;margin-top:2px}
   .lp .hint{display:none}
-  .lp .posts{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:44px -20px 0;padding:0 20px 8px;gap:14px}
-  .lp .post{flex:0 0 82%;scroll-snap-align:start}
+  .lp .posts{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:28px -20px 0;padding:0 20px 8px;gap:12px}
+  .lp .post{flex:0 0 72%;scroll-snap-align:start;border-radius:20px}
+  .lp .post .art{height:120px}
+  .lp .post .body{padding:14px 16px 16px;gap:8px}
+  .lp .post h3{font-size:18px}
   .lp .posts{scroll-padding-left:20px}
+  .lp .how-sec{padding:36px 0 44px}
+  .lp .step{padding:16px 16px;gap:12px;border-radius:18px}
+  .lp .step h3{font-size:18px}
+  .lp .step p{font-size:15px}
   .lp .signup{display:none}
-  .lp .cta-mobile{display:flex;width:100%;margin-top:32px;min-height:56px;font-size:17px}
-  .lp .cta-box{border-radius:32px}
+  .lp .final{padding:56px 0 64px}
+  .lp .cta-box{border-radius:28px;padding:32px 20px 36px}
+  .lp .cta-box h2{font-size:clamp(32px,9vw,44px)}
+  .lp .cta-box p{margin-top:12px;font-size:16px}
+  .lp .cta-mobile{display:flex;width:100%;margin-top:24px;min-height:56px;font-size:17px}
+  .lp .sec-cta{margin-top:20px}
+  .lp .sec-cta .btn{width:100%;min-height:56px;font-size:17px}
   .lp .foot-grid{grid-template-columns:1fr;gap:32px}
-  .lp .brand .word{display:none}
+}
+@media (max-width:400px){
+  .lp .nav-in{padding-left:12px;padding-right:12px;gap:6px}
+  .lp .nav .brand .word{height:11px}
+  .lp .menu-btn{width:40px;height:40px}
 }
 @media (prefers-reduced-motion: reduce){.lp{scroll-behavior:auto}.lp *{transition-duration:.01ms!important} }

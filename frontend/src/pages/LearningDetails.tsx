@@ -7,6 +7,7 @@ import {
   Lightbulb,
   ListChecks,
 } from "lucide-react";
+import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
 import LearningCard from "@/components/LearningCard";
 import QueryState from "@/components/QueryState";
@@ -66,11 +67,7 @@ const LearningDetails = () => {
       <p className="mt-2 text-sm text-muted-foreground">{article.description}</p>
 
       {article.image && (
-        <img
-          src={article.image}
-          alt={article.title}
-          className="mt-4 h-52 w-full rounded-2xl object-cover"
-        />
+        <ImagePreview src={article.image} alt={article.title} className="mt-4 h-52 w-full rounded-2xl object-cover" />
       )}
 
       <div className="mt-5 space-y-5">

@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Clock3, ImagePlus, Sprout, X } from "lucide-react";
+import { toast } from "sonner";
+import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -46,7 +48,9 @@ const Consultation = () => {
     try {
       await createConsultation.mutateAsync(body);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t("cons.err_send"));
+      const message = err instanceof ApiError ? err.message : t("cons.err_send");
+      setError(message);
+      toast.error(message);
       return;
     }
     setProblem("");
@@ -54,6 +58,7 @@ const Consultation = () => {
     clearImage();
     setError(null);
     setSent(true);
+    toast.success(t("cons.sent"));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -168,11 +173,7 @@ const Consultation = () => {
               </div>
               <p className="text-sm leading-relaxed text-muted-foreground">{item.problem}</p>
               {item.image && (
-                <img
-                  src={item.image}
-                  alt=""
-                  className="mt-3 max-h-48 w-full rounded-xl object-cover"
-                />
+                <ImagePreview src={item.image} className="mt-3 max-h-48 w-full rounded-xl object-cover" />
               )}
               {item.reply && (
                 <div className="mt-3 rounded-xl bg-primary/5 p-3">

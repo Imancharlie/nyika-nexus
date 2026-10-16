@@ -196,11 +196,11 @@ export function startHeroScene(
     const f1 = 0.7 + 0.3 * Math.sin(now * 0.05), f2 = 0.7 + 0.3 * Math.sin(now * 0.05 + 1.7);
     ([[-86, f1], [86, f2]] as const).forEach(([x, f]) => {
       const w = 78 * f;
-      ctx.fillStyle = "rgba(235,255,244,.13)";
+      ctx.fillStyle = "rgba(246, 230, 196, .34)";
       ctx.beginPath();
       ctx.ellipse(x, -38, w / 2 + 6, 6, 0, 0, 6.283);
       ctx.fill();
-      rr(x - w / 2, -41, w, 6, 3, "rgba(244,255,248,.92)");
+      rr(x - w / 2, -41, w, 6, 3, "#F6E6C4");
     });
     ctx.shadowColor = "rgba(200,241,105,.45)";
     ctx.shadowBlur = 26;
@@ -234,11 +234,11 @@ export function startHeroScene(
         S.ty = 0.38 + 0.14 * Math.sin(now * 0.0007 + 1.2);
       }
     }
-    const k = Math.min(1, dt * 0.0045), prev = S.px;
+    const k = Math.min(1, dt * 0.0016), prev = S.px;
     S.px += (S.tx - S.px) * k;
     S.py += (S.ty - S.py) * k;
     const vel = ((S.px - prev) * W) / Math.max(dt, 1);
-    S.tilt += (clamp(vel * 0.55, -0.28, 0.28) - S.tilt) * 0.12;
+    S.tilt += (clamp(vel * 0.32, -0.2, 0.2) - S.tilt) * 0.05;
     const sc = compact
       ? (mob ? 0.5 : clamp(Math.min(W / 1400, H / 380), 0.42, 0.8))
       : clamp(W / 1250, 0.56, 1.2);

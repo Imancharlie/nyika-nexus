@@ -34,6 +34,8 @@ class PostViewSet(viewsets.ModelViewSet):
             qs = qs.filter(author=self.request.user)
         elif params.get("saved"):
             qs = qs.filter(saves__user=self.request.user)
+        elif params.get("author"):
+            qs = qs.filter(author_id=params["author"])
         elif self.action == "list":
             qs = qs.filter(group__isnull=True)
         return qs
@@ -62,6 +64,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def like(self, request, pk=None):
         post, liked = self._toggle(PostLike, request)
+        post = self.get_queryset().get(pk=post.pk)
         if liked and post.author_id != request.user.id:
             notify(post.author, "penda", f"{request.user.full_name} amependa chapisho lako",
                    f"\"{post.text[:60]}\"", "/post")
@@ -83,6 +86,16 @@ class PostViewSet(viewsets.ModelViewSet):
             notify(post.author, "maoni", f"{request.user.full_name} ametoa maoni", text[:120], "/post")
         return Response(CommentSerializer(comment, context=self.get_serializer_context()).data,
                         status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["delete"], url_path=r"comments/(?P<comment_id>[0-9]+)")
+    def delete_comment(self, request, pk=None, comment_id=None):
+        comment = Comment.objects.filter(post_id=pk, pk=comment_id).first()
+        if comment is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if comment.author_id != request.user.id and not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GroupViewSet(viewsets.ModelViewSet):

@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import AuthShell, { AuthField, FormError, PasswordField } from "@/components/auth/AuthShell";
 import { useAuth, type AuthPayload, type PendingVerification } from "@/context/AuthContext";
-import { useLanguage } from "@/i18n/LanguageContext";
+import { useLanguage, type Lang } from "@/i18n/LanguageContext";
 import { api, ApiError, normalizePhone } from "@/lib/api";
 import { TZ_REGIONS } from "@/lib/regions";
 
@@ -13,12 +13,13 @@ type Form = {
   lastName: string;
   phone: string;
   region: string;
+  language: Lang;
   password: string;
   passwordConfirm: string;
 };
 
 const Signup = () => {
-  const { t } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
   const { acceptAuth } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -28,12 +29,22 @@ const Signup = () => {
     lastName: "",
     phone: (params.get("phone") ?? "").replace(/^\+255/, "0"),
     region: "",
+    language: lang,
     password: "",
     passwordConfirm: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setForm((f) => (f.language === lang ? f : { ...f, language: lang }));
+  }, [lang]);
+
+  const pickLanguage = (next: Lang) => {
+    setLang(next);
+    setForm((f) => ({ ...f, language: next }));
+  };
 
   const set = (key: keyof Form) => (e: { target: { value: string } }) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -141,6 +152,26 @@ const Signup = () => {
               <option key={r} value={r}>{r}</option>
             ))}
           </select>
+        </div>
+        <div className="space-y-1.5">
+          <p className="text-sm font-semibold">{t("auth.language")}</p>
+          <div className="grid grid-cols-2 gap-3" role="group" aria-label={t("auth.language")}>
+            {(["sw", "en"] as const).map((code) => (
+              <button
+                key={code}
+                type="button"
+                aria-pressed={form.language === code}
+                onClick={() => pickLanguage(code)}
+                className={
+                  form.language === code
+                    ? "min-h-[52px] rounded-2xl bg-forest text-base font-semibold text-white"
+                    : "min-h-[52px] rounded-2xl border-[1.5px] border-[#BFE3CB] bg-white text-base font-semibold text-foreground"
+                }
+              >
+                {code === "sw" ? "Kiswahili" : "English"}
+              </button>
+            ))}
+          </div>
         </div>
         <PasswordField
           label={t("auth.password")}

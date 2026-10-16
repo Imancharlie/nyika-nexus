@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Minus, Package, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,7 +41,9 @@ const Kikapu = () => {
       toast.success(t("shop.order_placed"));
       navigate("/lipia");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t("auth.err_generic"));
+      const message = err instanceof ApiError ? err.message : t("auth.err_generic");
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -59,7 +62,7 @@ const Kikapu = () => {
             {lines.map(({ product, quantity }) => (
               <li key={product.id} className="flex items-center gap-3 rounded-2xl border bg-card p-3">
                 {product.image ? (
-                  <img src={product.image} alt="" className="h-16 w-16 rounded-xl object-cover" />
+                  <ImagePreview src={product.image} className="h-16 w-16 rounded-xl object-cover" />
                 ) : (
                   <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-chip"><Package className="h-6 w-6 text-emerald" /></span>
                 )}

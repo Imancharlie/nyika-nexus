@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Minus, Package, Plus, Search, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import CategoryChip from "@/components/CategoryChip";
+import ImagePreview from "@/components/ImagePreview";
 import QueryState from "@/components/QueryState";
 import { useCart } from "@/context/CartContext";
 import { useProducts } from "@/hooks/useApi";
@@ -28,7 +29,7 @@ const ProductCard = ({ product }: { product: Product }) => {
     <article className="flex flex-col overflow-hidden rounded-[22px] border border-border/70 bg-card">
       <div className="relative aspect-[4/3] bg-chip">
         {product.image ? (
-          <img src={product.image} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
+          <ImagePreview src={product.image} alt={product.name} className="h-full w-full object-cover" />
         ) : (
           <Package className="absolute inset-0 m-auto h-10 w-10 text-emerald/50" />
         )}
@@ -88,6 +89,8 @@ const Bidhaa = () => {
   const { count, total } = useCart();
   const [category, setCategory] = useState<ProductCategory | "all">("all");
   const [query, setQuery] = useState(params.get("q") ?? "");
+  const dockRef = useRef<HTMLAnchorElement>(null);
+  const [dockInView, setDockInView] = useState(false);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -97,6 +100,20 @@ const Bidhaa = () => {
         (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)),
     );
   }, [products, category, query]);
+
+  useLayoutEffect(() => {
+    const el = dockRef.current;
+    if (!el) {
+      setDockInView(false);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setDockInView(entry.isIntersecting),
+      { rootMargin: "0px 0px -88px 0px", threshold: 0.6 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [count, visible.length]);
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -145,13 +162,24 @@ const Bidhaa = () => {
       </Link>
 
       {count > 0 && (
-        <div className="sticky bottom-4 z-30">
-          <Link to="/kikapu" className="btn-lime w-full justify-between px-5 text-base shadow-xl">
-            <span className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5" /> {t("shop.cart")} · {count}
-            </span>
-            <span className="tabular-nums">{formatTZS(total)}</span>
-          </Link>
+        <Link ref={dockRef} to="/kikapu" className="btn-lime w-full justify-between px-5 text-base shadow-xl">
+          <span className="flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5" /> {t("shop.cart")} · {count}
+          </span>
+          <span className="tabular-nums">{formatTZS(total)}</span>
+        </Link>
+      )}
+
+      {count > 0 && !dockInView && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-20 z-30 min-[901px]:left-[268px]">
+          <div className="pointer-events-auto mx-auto w-full max-w-[1280px] px-[clamp(18px,3vw,36px)]">
+            <Link to="/kikapu" className="btn-lime w-full justify-between px-5 text-base shadow-xl">
+              <span className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5" /> {t("shop.cart")} · {count}
+              </span>
+              <span className="tabular-nums">{formatTZS(total)}</span>
+            </Link>
+          </div>
         </div>
       )}
     </div>

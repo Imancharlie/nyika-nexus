@@ -3,8 +3,9 @@ from rest_framework import permissions, serializers
 
 
 def media_url(request, file_field, fallback: str = "") -> str:
+    # Root-relative so photos load through the app, including on a phone.
     if file_field:
-        return request.build_absolute_uri(file_field.url) if request else file_field.url
+        return file_field.url
     return fallback or ""
 
 
