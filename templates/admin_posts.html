@@ -1,0 +1,141 @@
+{% extends base_template %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-gradient-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0"><i class="fas fa-newspaper me-2"></i>Admin Post Management</h1>
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-list me-1"></i>Total Posts: {{ posts|length }}
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Advanced Search Form -->
+            <form method="get" class="mb-4">
+                <div class="input-group input-group-lg">
+                    <input type="text" name="q" class="form-control rounded-start"
+                           placeholder="🔍 Search by farmer, caption, or ID"
+                           value="{{ query }}"
+                           aria-label="Search posts">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                        {% if query %}
+                        <a href="{% url 'admin_view_posts' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times-circle me-2"></i>Clear
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+
+            <!-- Responsive Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr class="text-center">
+                            <th>ID</th>
+                            <th>Farmer</th>
+                            <th style="width: 25%;">Caption</th>
+                            <th>Media Preview</th>
+                            <th>Date Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                        <tr class="text-center align-middle">
+                            <td class="fw-bold">{{ post.id }}</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    {{ post.farmer.username }}
+                                </span>
+                            </td>
+                            <td class="text-wrap text-break">
+                                <div class="text-truncate" style="max-width: 250px;" title="{{ post.caption }}">
+                                    {{ post.caption }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if post.media %}
+                                {% load custom_filters %}
+                                    <div class="media-preview">
+                                        {% if post.media.url|ends_with:".mp4" or post.media.url|ends_with:".webm" or post.media.url|ends_with:".ogg" %}
+                                            <video width="150" class="img-thumbnail" controls>
+                                                <source src="{{ post.media.url }}" type="video/mp4">
+                                                Browser not supported
+                                            </video>
+                                        {% else %}
+                                            <img src="{{ post.media.url }}"
+                                                 alt="{{ post.caption }}"
+                                                 class="img-thumbnail"
+                                                 style="max-width: 150px; max-height: 150px; object-fit: cover;">
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="badge bg-secondary">No Media</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ post.date_created|date:"M d, Y H:i" }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <form action="{% url 'admin_delete_post' post.id %}"
+                                          method="post"
+                                          class="m-0"
+                                          onsubmit="return confirm('Delete this post?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% if query %}
+                                No posts found matching "{{ query }}"
+                                {% else %}
+                                No posts available
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .text-truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .media-preview {
+        max-height: 150px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .bg-gradient-primary {
+        background: linear-gradient(to right, #4e73df 0%, #224abe 100%);
+    }
+</style>
+{% endblock %}

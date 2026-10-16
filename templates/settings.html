@@ -1,0 +1,276 @@
+{% extends base_template %}
+
+{% block title %}Settings - Nyika Nexus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+
+    .settings-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        padding: 25px;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #27ae60;
+    }
+
+    .settings-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 30px;
+    }
+
+    .settings-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        border-color: #27ae60;
+        outline: none;
+    }
+
+    .toggle-switch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #27ae60;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .btn-save {
+        background: #27ae60;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+
+    .btn-save:hover {
+        background: #219a52;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .settings-container {
+            padding: 0 10px;
+        }
+
+        .settings-sections {
+            grid-template-columns: 1fr;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container" data-language="en">
+    <div class="settings-card">
+        <h1 class="page-title" data-en="Account Settings" data-sw="Mipangilio ya Akaunti">
+            Account Settings
+        </h1>
+
+        <div class="settings-sections">
+            <div class="settings-section">
+                <h2 class="section-title" data-en="Profile Information" data-sw="Taarifa za Profaili">
+                    Profile Information
+                </h2>
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" data-en="Full Name" data-sw="Jina Kamili">Full Name</label>
+                        <input type="text" name="name" class="form-input" value="{{ farmer.name }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Email Address" data-sw="Barua Pepe">Email Address</label>
+                        <input type="email" name="email" class="form-input" value="{{ farmer.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Phone Number" data-sw="Namba ya Simu">Phone Number</label>
+                        <input type="tel" name="phone_number" class="form-input" value="{{ farmer.phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Farm Location" data-sw="Eneo la Shamba">Farm Location</label>
+                        <input type="text" name="street" class="form-input" value="{{ farmer.street }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Farm Size (Hectares)" data-sw="Ukubwa wa Shamba (Hekta)">
+                            Farm Size (Hectares)
+                        </label>
+                        <input type="number" name="farm_size" class="form-input" value="{{ farmer.farm_size }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Crop Type" data-sw="Aina ya Mazao">Crop Type</label>
+                        <input type="text" name="crop_type" class="form-input" value="{{ farmer.crop_type }}">
+                    </div>
+                    <button type="submit" class="btn-save" data-en="Update Profile" data-sw="Sasisha Profaili">
+                        Update Profile
+                    </button>
+                </form>
+            </div>
+
+
+            <!--<div class="settings-section">-->
+            <!--    <h2 class="section-title">Notification Preferences</h2>-->
+            <!--    <div class="toggle-switch">-->
+            <!--        <span>Email Notifications</span>-->
+            <!--        <label class="switch">-->
+            <!--            <input type="checkbox" checked>-->
+            <!--            <span class="slider"></span>-->
+            <!--        </label>-->
+            <!--    </div>-->
+            <!--    <div class="toggle-switch">-->
+            <!--        <span>SMS Alerts</span>-->
+            <!--        <label class="switch">-->
+            <!--            <input type="checkbox">-->
+            <!--            <span class="slider"></span>-->
+            <!--        </label>-->
+            <!--    </div>-->
+            <!--    <div class="toggle-switch">-->
+            <!--        <span>Weather Alerts</span>-->
+            <!--        <label class="switch">-->
+            <!--            <input type="checkbox" checked>-->
+            <!--            <span class="slider"></span>-->
+            <!--        </label>-->
+            <!--    </div>-->
+            <!--    <div class="toggle-switch">-->
+            <!--        <span>Market Price Updates</span>-->
+            <!--        <label class="switch">-->
+            <!--            <input type="checkbox" checked>-->
+            <!--            <span class="slider"></span>-->
+            <!--        </label>-->
+            <!--    </div>-->
+            <!--    <button class="btn-save">Save Preferences</button>-->
+            <!--</div>-->
+
+            <div class="settings-section">
+                <h2 class="section-title">Security Settings</h2>
+               <form method="POST" action="{% url 'update_password' %}" data-language="en">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="form-label" data-en="Current Password" data-sw="Nenosiri la Sasa">
+            Current Password
+        </label>
+        <input type="password" name="password" class="form-input">
+    </div>
+    <div class="form-group">
+        <label class="form-label" data-en="New Password" data-sw="Nenosiri Jipya">
+            New Password
+        </label>
+        <input type="password" name="new_password" class="form-input">
+    </div>
+    <div class="form-group">
+        <label class="form-label" data-en="Confirm New Password" data-sw="Thibitisha Nenosiri Jipya">
+            Confirm New Password
+        </label>
+        <input type="password" name="confirm_password" class="form-input">
+    </div>
+    <div class="toggle-switch">
+        <span data-en="Two-Factor Authentication" data-sw="Uthibitishaji wa Njia Mbili">
+            Two-Factor Authentication
+        </span>
+        <label class="switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <button type="submit" class="btn-save" data-en="Update Security" data-sw="Sasisha Usalama">
+        Update Security
+    </button>
+</form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

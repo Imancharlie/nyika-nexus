@@ -1,0 +1,221 @@
+{% extends base_template %}
+
+{% block title %}View Orders - Nyika Nexus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 5px auto;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .orders-card {
+        width: 100%;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin-bottom: 30px;
+        box-sizing: border-box;
+    }
+
+    .page-title {
+        width: 100%;
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #27ae60;
+    }
+
+    .orders-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .order-item {
+        width: 100%;
+        border: 1px solid #e1e1e1;
+        border-radius: 12px;
+        padding: 25px;
+        text-align: left;
+        transition: all 0.3s;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+    .order-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border-color: #27ae60;
+    }
+
+    .order-service {
+        font-size: 1.4rem;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        word-wrap: break-word;
+    }
+
+    .order-detail {
+        color: #666;
+        margin-bottom: 10px;
+        line-height: 1.6;
+        word-wrap: break-word;
+    }
+
+    .order-status {
+        font-size: 1.2rem;
+        color: #27ae60;
+        margin-top: 20px;
+        font-weight: bold;
+    }
+
+    .completed-orders-summary {
+        width: 100%;
+        margin-top: 40px;
+    }
+
+    .completed-orders-summary h2 {
+        width: 100%;
+        color: #2c3e50;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #27ae60;
+    }
+
+    /* Table specific styles */
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 20px;
+        /* Shadow indicators for scroll */
+        background:
+            linear-gradient(to right, white 30%, rgba(255, 255, 255, 0)),
+            linear-gradient(to right, rgba(255, 255, 255, 0), white 70%) 100% 0,
+            radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.2), rgba(0,0,0,0)),
+            radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.2), rgba(0,0,0,0)) 100% 0;
+        background-repeat: no-repeat;
+        background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+        background-position: 0 0, 100% 0, 0 0, 100% 0;
+        background-attachment: local, local, scroll, scroll;
+    }
+
+    .completed-orders-table {
+        min-width: 750px; /* Fixed minimum width for table */
+        border-collapse: collapse;
+    }
+
+    .completed-orders-table th,
+    .completed-orders-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e1e1e1;
+        white-space: nowrap;
+    }
+
+    .completed-orders-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        color: #2c3e50;
+        position: sticky;
+        top: 0;
+    }
+
+    .completed-orders-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .completed-orders-table .status-completed {
+        color: #27ae60;
+        font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+        .orders-container {
+            padding: 0 10px;
+            max-width:310px;
+        }
+
+        .orders-grid {
+            grid-template-columns: 1fr;
+
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+
+        .order-item {
+            padding: 20px;
+        }
+
+        .completed-orders-summary h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+    <div class="orders-card">
+        <h1 class="page-title">Active Orders</h1>
+        <div class="orders-grid">
+            {% for order in pending_orders %}
+            <div class="order-item">
+                <h3 class="order-service">{{ order.service }}</h3>
+                <p class="order-detail"><strong>Name of Farmer:</strong> {{ order.user }}</p>
+                <p class="order-detail"><strong>Start Date:</strong> {{ order.start_date }}</p>
+                <p class="order-detail"><strong>Farm size:</strong> {{ order.farmsize }} acres</p>
+                <p class="order-detail"><strong>Location:</strong> {{ order.location }}, Tanzania</p>
+                <p class="order-detail"><strong>Additional Requirements:</strong> {{ order.additional_requirements }}</p>
+                <p class="order-status">Status: {{ order.status }}</p>
+            </div>
+            {% empty %}
+            <p>No active orders found.</p>
+            {% endfor %}
+        </div>
+
+        <div class="completed-orders-summary">
+            <h2>Completed Orders</h2>
+            <div class="table-wrapper">
+                <table class="completed-orders-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Farmer</th>
+                            <th>Farm Size</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.service }}</td>
+                            <td>{{ order.user }}</td>
+                            <td>{{ order.farmsize }} acres</td>
+                            <td>{{ order.location }}, Tanzania</td>
+                            <td class="status-completed">{{ order.status }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No completed orders found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

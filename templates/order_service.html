@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Services - Nyika Nexus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .service-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+
+    .service-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #27ae60;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .service-item {
+        border: 1px solid #e1e1e1;
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s;
+        background: #fff;
+    }
+
+    .service-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border-color: #27ae60;
+    }
+
+    .service-icon {
+        font-size: 2.5rem;
+        color: #27ae60;
+        margin-bottom: 20px;
+    }
+
+    .service-name {
+        font-size: 1.4rem;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .service-price {
+        font-size: 1.8rem;
+        color: #27ae60;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+
+    .service-description {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .order-form {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 10px;
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        border-color: #27ae60;
+        outline: none;
+    }
+
+    .btn-order {
+        background: #27ae60;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-order:hover {
+        background: #219a52;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .service-container {
+            padding: 0 15px;
+        }
+
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+
+        .service-item {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="service-container">
+    <div class="service-card">
+        <h1 class="page-title" data-en="Agricultural Services" data-sw="Huduma za Kilimo">Agricultural Services</h1>
+
+        <div class="services-grid">
+            <div class="service-item">
+                <i class="fas fa-spray-can service-icon"></i>
+                <h3 class="service-name" data-en="Fumigation" data-sw="Ufumigishaji/Upuliziaji wa dawa">Fumigation</h3>
+                <p class="service-description" data-en="Advanced and healthy friendly fumigation using drones powered with AI."
+                    data-sw="Ufumigishaji wa hali ya juu na salama ukitumia drones zinazotumia AI.">
+                    Advanced and healthy friendly fumigation using drones powered with AI.
+                </p>
+                <div class="service-price" data-en="Tsh20,000/Acres" data-sw="Tsh20,000/Ekari">Tsh20,000/Acres</div>
+                <button class="btn-order" onclick="location.href='#form'">Select Package</button>
+            </div>
+           <div class="service-item">
+                <i class="fas fa-flask service-icon"></i>
+                <h3 class="service-name" data-en="Soil PH Detection & Neutralization" data-sw="Utambuzi na Kusawazisha PH ya Udongo">Soil PH Detection & Neutralization</h3>
+                <p class="service-description" data-en="Comprehensive soil testing with detailed reports, recommendations, and neutralization solutions for correcting undesired pH levels."
+                    data-sw="Upimaji wa kina wa udongo na ripoti za kina, mapendekezo, na suluhisho za kusawazisha PH isiyohitajika.">
+                    Comprehensive soil testing with detailed reports, recommendations, and neutralization solutions for correcting undesired pH levels.
+                </p>
+                <div class="service-price" data-en="Tsh25,000/Acres" data-sw="Tsh25,000/Ekari">Tsh25,000/Acres</div>
+                <button class="btn-order" onclick="location.href='#form'">Select Package</button>
+            </div>
+
+
+            <div class="service-item">
+                <i class="fas fa-user-tie service-icon"></i>
+                <h3 class="service-name" data-en="Consultancy" data-sw="Ushauri">Consultancy</h3>
+                <p class="service-description"
+                    data-en="Involves providing expert advice and tailored solutions to farmers to improve productivity, sustainability, and profitability."
+                    data-sw="Inahusisha kutoa ushauri wa kitaalamu na suluhisho maalum kwa wakulima ili kuboresha uzalishaji, uendelevu, na faida.">
+                    Involves providing expert advice and tailored solutions to farmers to improve productivity, sustainability, and profitability.
+                </p>
+                <div class="service-price" data-en="Free" data-sw="Bure">Free</div>
+                <button class="btn-order" onclick="location.href='#form'">Select Package</button>
+            </div>
+
+            <div class="service-item">
+                <i class="fas fa-chalkboard-teacher service-icon"></i>
+                <h3 class="service-name" data-en="Training and Data monitoring" data-sw="Mafunzo na ufuatiliaji wa takwimu">
+                    Training and Data monitoring
+                </h3>
+                <p class="service-description"
+                    data-en="Training equips farmers and agricultural workers with the skills and knowledge needed to adopt innovative practices, modern technologies, and sustainable methods."
+                    data-sw="Mafunzo yanawawezesha wakulima na wafanyakazi wa kilimo kupata ujuzi na maarifa ya kutumia mbinu za kisasa, teknolojia za kisasa, na njia endelevu.">
+                    Training equips farmers and agricultural workers with the skills and knowledge needed to adopt innovative practices, modern technologies, and sustainable methods.
+                </p>
+                <div class="service-price" data-en="Free" data-sw="Bure">Free</div>
+                <button class="btn-order" onclick="location.href='#form'">Select Package</button>
+            </div>
+        </div>
+<section id='form'>
+      <form class="order-form" data-language="en" method="POST" action="">
+          {% csrf_token %}
+    <h2 style="margin-bottom: 20px; color: #2c3e50;" data-en="Order Details" data-sw="Maelezo ya Oda">
+        Order Details
+    </h2>
+
+    <div class="form-group">
+        <label class="form-label" data-en="Selected Service" data-sw="Huduma Iliyochaguliwa">
+            Selected Service
+        </label>
+        <select class="form-input"  name="service" required>
+            <option value="" data-en="Choose a service..." data-sw="Chagua huduma...">
+                Choose a service...
+            </option>
+            <option value="consultation" data-en="Farm Consultation" data-sw="Ushauri wa Kilimo">
+                Farm Consultation
+            </option>
+            <option value="soil_PH_detection" data-en="Soil Analysis" data-sw="Utambuzi wa PH ya Udongo">
+                Soil PH detection
+            </option>
+            <option value="Fumigation" data-en="Fumigation" data-sw="Upuliziaji wa dawa">
+                Fumigation
+            </option>
+            <option value="training" data-en="training" data-sw="mafunzo ya kilimo">
+                Training
+            </option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" data-en="Preferred Start Date" data-sw="Tarehe ya Mwanzo inayopendelewa">
+            Preferred Start Date
+        </label>
+        <input type="date" name="start_date" class="form-input" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" data-en="Farm Size (acres)" data-sw="Ukubwa wa Shamba (ekari)">
+            Farm Size (acres)
+        </label>
+        <input type="number" name="farm_size" class="form-input" placeholder="Enter farm size" required>
+    </div>
+    <div class="form-group">
+        <label class="form-label" data-en="Location" data-sw="Mahali">
+            Location
+        </label>
+        <input type="name" name="location" class="form-input" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" data-en="Additional Requirements" data-sw="Mahitaji ya ziada">
+            Additional Requirements
+        </label>
+        <textarea class="form-input" name="additional_requirements" rows="4" placeholder="Specify any special requirements..."></textarea>
+    </div>
+
+    <button type="submit" class="btn-order" data-en="Place Order" data-sw="Weka Agizo">
+        Place Order
+    </button>
+</form>
+</section>
+
+    </div>
+</div>
+{% endblock %}

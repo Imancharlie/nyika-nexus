@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        /* Same styles as login.html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(-45deg, #ee7752,#2A5A3B,rgb(9, 91, 121), #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 25s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            color: white;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-button:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .login-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .login-footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+            .login-container {
+                max-width: 450px;
+            }
+        }
+
+        /* Styling for the select dropdown */
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s ease-in-out;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        select:focus {
+            border-color: #4d90fe;
+            outline: none;
+            box-shadow: 0 0 5px rgba(77, 144, 254, 0.5);
+        }
+
+        select.wrapper {
+            position: relative;
+        }
+
+        select.wrapper::after {
+            content: '\25BC';
+            position: absolute;
+            top: 50%;
+            right: 16px;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #aaa;
+            pointer-events: none;
+        }
+
+        select:focus {
+            border-color: #5e9ed6;
+            background-color:rgb(81, 143, 197);
+        }
+
+        select:hover {
+            border-color: #5e9ed6;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Registration form</h1>
+                <p>Create your farmer account</p>
+            </div>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label for="{{ form.name.id_for_label }}">Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.region.id_for_label }}">Region</label>
+                    {{ form.region }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.district.id_for_label }}">District</label>
+                    {{ form.district }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.farm_name.id_for_label }}">Street</label>
+                    {{ form.street }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.farm_size.id_for_label }}">Farm Size (Hectares)</label>
+                    {{ form.farm_size }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.crop_type.id_for_label }}">Crop Type</label>
+                    {{ form.crop_type }}
+                </div>
+
+                <div class="input-group">
+                    <label for="{{ form.address.id_for_label }}">Address</label>
+                    {{ form.address }}
+                </div>
+
+                <button type="submit" class="login-button">Register</button>
+            </form>
+
+            <div class="login-footer">
+                <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to dynamically fetch districts based on selected region
+        document.querySelector('[name="region"]').addEventListener('change', function() {
+            var region = this.value;
+            var districtSelect = document.querySelector('[name="district"]');
+
+            fetch(`/get_districts/?region=${region}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear current options
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
+
+                    // Add new options based on the response
+                    data.districts.forEach(function(district) {
+                        var option = document.createElement('option');
+                        option.value = district[0];  // Assuming district[0] is the district ID
+                        option.textContent = district[1];  // Assuming district[1] is the district name
+                        districtSelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
+
+</body>
+</html>

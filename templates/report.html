@@ -1,0 +1,438 @@
+{% extends base_template %}
+
+{% block title %}Agricultural Expert Reports - Nyika Nexus{% endblock %}
+
+{% block content %}<div class="content-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1 class="header-title" data-en="Agricultural Reports" data-sw="Ripoti za Kilimo">
+                <i class="fas fa-file-alt"></i>
+                Agricultural Reports
+            </h1>
+            <p class="header-description" data-en="Access comprehensive agricultural insights and recommendations from our experts" data-sw="Pata ufahamu wa kina wa kilimo na mapendekezo kutoka kwa wataalam wetu">
+                Access comprehensive agricultural insights and recommendations from our experts
+            </p>
+        </div>
+        <div class="header-actions">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search reports..." id="reportSearch"
+                    data-en="Search reports..."
+                    data-sw="Tafuta ripoti...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Filter Section -->
+    <div class="filters-section">
+        <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all" data-en="All Reports" data-sw="Ripoti Zote">All Reports</button>
+            <button class="filter-pill" data-filter="crops" data-en="Crop Management" data-sw="Usimamizi wa Mazao">Crop Management</button>
+            <button class="filter-pill" data-filter="soil" data-en="Soil Analysis" data-sw="Uchambuzi wa Udongo">Soil Analysis</button>
+            <button class="filter-pill" data-filter="market" data-en="Market Trends" data-sw="Mwelekeo wa Soko">Market Trends</button>
+            <button class="filter-pill" data-filter="tech" data-en="Agriculture Tech" data-sw="Teknolojia ya Kilimo">Agriculture Tech</button>
+        </div>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="reports-grid">
+        {% for report in reports %}
+        <div class="report-card">
+            <div class="report-header">
+                <div class="report-type {{ report.report_type }}"
+                    data-en="{{ report.get_report_type_display }}"
+                    data-sw="{{ report.get_report_type_display}}">
+                    <i class="fas fa-seedling"></i>
+                    {{ report.get_report_type_display }}
+                </div>
+                <span class="report-date"
+                    data-en="{{ report.created_date|date:'M d, Y' }}"
+                    data-sw="{{ report.created_date|date:'d M, Y' }}">
+                    {{ report.created_date|date:"M d, Y" }}
+                </span>
+            </div>
+            <div class="report-content">
+                <h3 class="report-title"
+                    {{ report.title }}
+                </h3>
+                <p class="report-description"
+                    {{ report.description }}
+                </p>
+                <div class="report-meta">
+                    <span data-en="Author: Nyika Nexus Expert" data-sw="Mwandaaji: Mtaalamu wa kilimo Nexus">
+                        <i class="fas fa-user"></i> Nyika Nexus Expert
+                    </span>
+                    <span data-en="{{ report.pages }} pages" data-sw="{{ report.pages }} kurasa">
+                        <i class="fas fa-clock"></i> {{ report.pages }} pages
+                    </span>
+                </div>
+            </div>
+            <div class="report-actions">
+                <a href="{{ report.file.url }}" class="preview-btn" target="_blank"
+                    data-en="Preview"
+                    data-sw="Angalia">
+                    <i class="fas fa-eye"></i> Preview
+                </a>
+                <a href="{{ report.file.url }}" class="download-btn" download
+                    data-en="Download PDF"
+                    data-sw="Pakua PDF">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <p data-en="No reports assigned to you at the moment." data-sw="Hakuna ripoti zilizokabidhiwa kwako kwa sasa.">
+            No reports assigned to you at the moment.
+        </p>
+        {% endfor %}
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" style="display: none;"
+        data-en="Loading reports..."
+        data-sw="Inapakia ripoti...">
+        <i class="fas fa-spinner fa-spin"></i>
+        Loading reports...
+    </div>
+</div>
+
+
+<style>
+/* Page Layout */
+.content-wrapper {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Page Header */
+.page-header {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-title {
+    font-size: 1.8rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-description {
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+    min-width: 300px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(42, 90, 59, 0.1);
+    outline: none;
+}
+
+/* Filters Section */
+.filters-section {
+    margin-bottom: 2rem;
+}
+
+.filter-pills {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-pill {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.filter-pill:hover {
+    background: var(--background);
+}
+
+.filter-pill.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Reports Grid */
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+/* Report Card */
+.report-card {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.report-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.report-header {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.report-type {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.report-type.soil { background: #dcfce7; color: #166534; }
+.report-type.market { background: #fee2e2; color: #991b1b; }
+.report-type.tech { background: #dbeafe; color: #1e40af; }
+
+.report-date {
+    color: var(--text-light);
+    font-size: 0.875rem;
+}
+
+.report-content {
+    padding: 1.5rem;
+}
+
+.report-title {
+    font-size: 1.25rem;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+}
+
+.report-description {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.report-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-light);
+    font-size: 0.875rem;
+}
+
+.report-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.report-actions {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.preview-btn, .download-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preview-btn {
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid #e2e8f0;
+}
+
+.preview-btn:hover {
+    background: #e2e8f0;
+}
+
+.download-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.download-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 1rem;
+    }
+    .header-title{
+        font-size: 1.3rem;
+    }
+    .header-description {
+        font-size: 0.9rem;
+    }
+    .download-btn {
+        font-size: 0.9rem;
+        padding: 0.1rem;
+    }
+    .page-header {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 1.0rem;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .header-actions {
+        width: 100%;
+    }
+
+    .search-box {
+        min-width: unset;
+    }
+
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-pills {
+        justify-content: center;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.report-card {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filterPills = document.querySelectorAll('.filter-pill');
+
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', function() {
+            // Remove active class from all pills
+            filterPills.forEach(p => p.classList.remove('active'));
+            // Add active class to clicked pill
+            this.classList.add('active');
+
+            // Show loading state
+            document.querySelector('.loading-state').style.display = 'block';
+            document.querySelector('.reports-grid').style.opacity = '0.5';
+
+            // Simulate loading
+            setTimeout(() => {
+                document.querySelector('.loading-state').style.display = 'none';
+                document.querySelector('.reports-grid').style.opacity = '1';
+            }, 800);
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('reportSearch');
+    const reportCards = document.querySelectorAll('.report-card');
+
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+
+        reportCards.forEach(card => {
+            const title = card.querySelector('.report-title').textContent.toLowerCase();
+            const description = card.querySelector('.report-description').textContent.toLowerCase();
+
+            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    // Download button click handler
+    const downloadButtons = document.querySelectorAll('.download-btn');
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check"></i> Downloaded';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            }, 1500);
+        });
+    });
+
+    // Preview button click handler
+    const previewButtons = document.querySelectorAll('.preview-btn');
+    previewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Add preview functionality here
+            alert('Preview functionality coming soon!');
+        });
+    });
+});
+</script>
+{% endblock %}

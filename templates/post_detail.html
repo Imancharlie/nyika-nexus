@@ -1,0 +1,122 @@
+{% extends base_template %}
+
+
+{% block content %}
+<div class="posts-container">
+    <div class="post-card">
+        <!-- Post Header -->
+        <div class="post-header">
+            <div class="post-user">
+                <div class="user-avatar">
+                    {% if post.farmer.profile_picture %}
+                        <img src="{{ post.farmer.profile_picture.url }}" alt="{{ post.farmer.username }}">
+                    {% else %}
+                        <i class="fas fa-user-circle"></i>
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <strong>{{ post.farmer.username }}</strong>
+                    <span class="post-location">Nyika farm</span>
+                </div>
+            </div>
+            <button class="post-menu">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
+        </div>
+
+        <!-- Post Media -->
+        <div class="post-media">
+            <!-- filepath: /d:/Próximo Projeto/nexus/templates/post.html -->
+<div class="post-media">
+   <!-- filepath: /d:/Próximo Projeto/nexus/templates/post.html -->
+<div class="post-media">
+    {% load custom_filters %}
+
+{% if post.media %}
+    {% if post.media.url|ends_with:".mp4" %}
+        <!-- Display MP4 video -->
+        <video controls width="100%">
+            <source src="{{ post.media.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    {% elif post.media.url|ends_with:".webm" %}
+        <!-- Display WebM video -->
+        <video controls width="100%">
+            <source src="{{ post.media.url }}" type="video/webm">
+            Your browser does not support the video tag.
+        </video>
+    {% elif post.media.url|ends_with:".ogg" %}
+        <!-- Display OGG video -->
+        <video controls width="100%">
+            <source src="{{ post.media.url }}" type="video/ogg">
+            Your browser does not support the video tag.
+        </video>
+
+    {% else %}
+    <img src="{{ post.media.url }}" alt="{{ post.title }}">
+    {% endif %}
+{% endif %}
+</div>
+</div>
+        </div>
+
+        <!-- Post Actions -->
+        <div class="post-actions">
+            <div class="action-buttons">
+                <button class="action-btn like-btn" title="Like">
+                    <i class="far fa-heart"></i>
+                </button>
+                <button class="action-btn comment-btn" title="Comment">
+                    <i class="far fa-comment"></i>
+                </button>
+                <button class="action-btn share-btn" title="Share">
+                    <i class="far fa-paper-plane"></i>
+                </button>
+            </div>
+            <button class="action-btn save-btn" title="Save">
+                <i class="far fa-bookmark"></i>
+            </button>
+        </div>
+
+        <!-- Post Content -->
+        <div class="post-content">
+            <div class="post-likes">
+                {{ post.like_count }} likes
+            </div>
+            <div class="post-caption">
+                <strong>{{ post.farmer.username }}</strong>
+                {{ post.caption }}
+            </div>
+            <div class="post-comments">
+                <button class="view-comments" onclick="toggleComments({{ post.id }})">All comments </button>
+                <div id="comments-{{ post.id }}" class="comments-section">
+                    {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <strong>{{ comment.author.username }}</strong>: {{ comment.comment }}
+                    </div>
+                    {% empty %}
+                    <p>No comments yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="post-time">
+                {{ post.date_created|timesince }} ago
+            </div>
+        </div>
+
+        <!-- Comment Input -->
+        <div class="post-comment-input">
+            <form method="POST" action="{% url 'post' %}">
+                {% csrf_token %}
+                <button type="button" class="emoji-btn">
+                    <i class="far fa-smile"></i>
+                </button>
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <input type="text" name="comment" placeholder="Add a comment..." required>
+                <button type="submit" class="post-btn">Post</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

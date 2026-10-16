@@ -1,0 +1,152 @@
+{% extends base_template %}
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-lg">
+        <!-- Card Header -->
+        <div class="card-header bg-gradient-primary text-white">
+            <h2 class="mb-0"><i class="fas fa-tasks me-2"></i>{{ challenge.title }}</h2>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+            <!-- Farmer Details -->
+            <div class="mb-4">
+                <p class="mb-2"><strong><i class="fas fa-user me-2"></i>Farmer:</strong>
+                    <span class="badge bg-info">{{ challenge.farmer.username }}</span>
+                </p>
+                {% if challenge.image %}
+                    <div class="my-3">
+                        <img src="{{ challenge.image.url }}" class="img-fluid rounded shadow-sm" alt="Challenge Image" style="max-height: 400px; width: auto;">
+                    </div>
+                {% endif %}
+                <p class="mb-2"><strong><i class="fas fa-calendar-alt me-2"></i>challenge type:</strong>
+                    <span class="text-muted">{{ challenge.challenge_type }}</span>
+                </p>
+                <!-- Challenge Status -->
+                <p class="mb-2"><strong><i class="fas fa-info-circle me-2"></i>Status:</strong>
+                    <span class="badge {% if challenge.status == 'open' %}bg-warning{% else %}bg-success{% endif %}">
+                        {{ challenge.get_status_display }}
+                    </span>
+                </p>
+                <!-- Challenge Creation Date -->
+                <p class="mb-2"><strong><i class="fas fa-calendar-alt me-2"></i>Created:</strong>
+                    <span class="text-muted">{{ challenge.date_created|date:"M d, Y H:i" }}</span>
+                </p>
+                <!-- Expert Response (Collapsible) -->
+                <!-- Challenge Description -->
+                <p class="mb-2"><strong><i class="fas fa-align-left me-2"></i>Description:</strong>
+                    <span class="text-muted">{{ challenge.description }}</span>
+                </p>
+                <!-- Challenge Image -->
+                
+                
+                {% if challenge.expert_response %}
+                    <div class="mt-4">
+                        <button class="btn btn-link p-0 text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#expertResponse" aria-expanded="false" aria-controls="expertResponse">
+                            <strong><i class="fas fa-comment-dots me-2"></i>Expert Response</strong>
+                        </button>
+                        <div class="collapse" id="expertResponse">
+                            <div class="p-3 bg-light rounded mt-2">
+                                <p class="mb-0 text-muted">{{ challenge.expert_response }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom color palette */
+    :root {
+        --primary-blue: #4e73df; /* Soft blue */
+        --secondary-blue: #224abe; /* Darker blue */
+        --primary-green: #28a745; /* Fresh green */
+        --light-green: #d4edda; /* Light green for backgrounds */
+        --light-blue: #d1e7ff; /* Light blue for backgrounds */
+        --white: #ffffff; /* Pure white */
+        --light-gray: #f8f9fa; /* Light gray for subtle backgrounds */
+        --text-dark: #343a40; /* Dark text for contrast */
+        --text-muted: #6c757d; /* Muted text for less emphasis */
+    }
+
+    body {
+        background-color: var(--light-gray);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+    }
+
+    .card {
+        background-color: var(--white);
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .badge.bg-info {
+        background-color: var(--primary-blue) !important;
+        color: var(--white);
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: var(--text-dark);
+    }
+
+    .badge.bg-success {
+        background-color: var(--primary-green) !important;
+        color: var(--white);
+    }
+
+    .img-fluid {
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .img-fluid:hover {
+        transform: scale(1.02);
+    }
+
+    .bg-light {
+        background-color: var(--light-blue) !important;
+    }
+
+    .text-muted {
+        color: var(--text-muted) !important;
+    }
+
+    .shadow-sm {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .collapse {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap JS for Collapsible Section -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

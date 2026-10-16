@@ -1,0 +1,278 @@
+{% extends "staff_base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #27ae60;
+        --secondary-color: #3498db;
+        --background-color: #f4f6f9;
+        --gradient-primary: linear-gradient(135deg, #27ae60, #2ecc71);
+        --gradient-secondary: linear-gradient(135deg, #3498db, #2980b9);
+    }
+
+    html, body {
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: var(--background-color);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .card-icon {
+        background: var(--gradient-primary);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .card-statistic {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .dashboard-card h3 {
+        font-size: 1.0rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+
+    .metric-trend {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .trend-up {
+        color: #27ae60;
+    }
+
+    .trend-down {
+        color: #e74c3c;
+    }
+
+    .chart-container {
+        height: 400px;
+        margin-top: 30px;
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+    }
+
+    .chart-container h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+            padding: 15px;
+        }
+         .dashboard-card {
+     max-width: 80%;
+    }
+
+        .card-statistic {
+            font-size: 2rem;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.25rem;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Performance Cards -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="card-statistic">{{ total_users }}</span>
+        </div>
+        <h3>Total Users</h3>
+        <p class="metric-trend trend-up">+8.5% <small>from last month</small></p>
+    </div>
+
+    <!-- Unresolved Challenges -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon" style="background: var(--gradient-secondary);">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <span class="card-statistic">{{ unresolved_challenges }}</span>
+        </div>
+        <h3>Unresolved Challenges</h3>
+        <p class="metric-trend trend-down">Pending challenges</p>
+    </div>
+
+    <!-- Average Resolution Time -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                <i class="fas fa-clock"></i>
+            </div>
+            <span class="card-statistic">{{ avg_resolution_time }} days</span>
+        </div>
+        <h3>Avg Resolution Time</h3>
+        <p class="metric-trend trend-up">Time taken to resolve challenges</p>
+    </div>
+
+    <!-- New Registered Users -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <span class="card-statistic">{{ new_users_this_month }}</span>
+        </div>
+        <h3>New Users This Month</h3>
+        <p class="metric-trend trend-up">+{{ growth_percentage }}% <small>growth</small></p>
+    </div>
+
+    <!-- Additional Cards -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <span class="card-statistic">{{ total_services }}</span>
+        </div>
+        <h3>Total Services</h3>
+        <p class="metric-trend trend-up">+12% <small>from last month</small></p>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <span class="card-statistic">$0</span>
+        </div>
+        <h3>Monthly Revenue</h3>
+        <p class="metric-trend trend-up">0% <small>from last month</small></p>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="chart-container">
+        <h4>Monthly Revenue Trend</h4>
+        <canvas id="revenueChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h4>User Growth</h4>
+        <canvas id="userChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Revenue Chart Configuration
+    var revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    var revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Monthly Revenue',
+                data: [12000, 19000, 15000, 22000, 18000, 25000],
+                borderColor: '#27ae60',
+                backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // User Growth Chart Configuration
+    var userCtx = document.getElementById('userChart').getContext('2d');
+    var userChart = new Chart(userCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'New Users',
+                data: [120, 190, 150, 220, 180, 250],
+                backgroundColor: '#3498db'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
