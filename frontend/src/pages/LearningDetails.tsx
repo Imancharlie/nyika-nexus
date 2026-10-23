@@ -1,4 +1,5 @@
-import { Link, useParams } from "react-router-dom";
+import { useState, type FormEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowRight,
   Bookmark,
@@ -15,6 +16,9 @@ import NotFound from "./NotFound";
 import { useArticles, useCategories, useToggleSaveArticle } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import AdvisorFab from "@/components/AdvisorFab";
 
 const LearningDetails = () => {
   const { id } = useParams();
@@ -23,6 +27,20 @@ const LearningDetails = () => {
   const toggleSave = useToggleSaveArticle();
   const toggleSaveArticle = (articleId: string) => toggleSave.mutate(articleId);
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [question, setQuestion] = useState("");
+  const [askError, setAskError] = useState<string | null>(null);
+
+  const ask = (event: FormEvent) => {
+    event.preventDefault();
+    const current = articles.find((item) => item.id === id);
+    const text = question.trim();
+    if (!current || text.length < 3) {
+      setAskError(t("chat.ask_short"));
+      return;
+    }
+    navigate(`/mshauri?article=${encodeURIComponent(current.id)}&q=${encodeURIComponent(text)}&n=${Date.now()}`);
+  };
 
   if (isLoading) return <QueryState isLoading isError={false}>{null}</QueryState>;
   const article = articles.find((item) => item.id === id);
@@ -105,12 +123,25 @@ const LearningDetails = () => {
         </section>
       )}
 
-      <Link
-        to="/ushauri"
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-4 font-bold text-primary-foreground"
-      >
-        {t("learn.ask")} <ArrowRight className="h-4 w-4" />
-      </Link>
+      <form onSubmit={ask} className="mt-4 space-y-3 rounded-3xl border border-primary/30 bg-primary/5 p-4">
+        <label htmlFor="makala-swali" className="text-sm font-bold text-primary">
+          {t("chat.ask_title")}
+        </label>
+        <Textarea
+          id="makala-swali"
+          value={question}
+          rows={3}
+          placeholder={t("chat.ask_ph")}
+          onChange={(event) => {
+            setQuestion(event.target.value);
+            setAskError(null);
+          }}
+        />
+        {askError && <p className="text-xs font-medium text-destructive">{askError}</p>}
+        <Button type="submit" className="w-full rounded-2xl py-5 text-base font-bold">
+          {t("chat.ask_send")} <ArrowRight className="h-4 w-4" />
+        </Button>
+      </form>
 
       {related.length > 0 && (
         <section className="mt-7">
@@ -127,6 +158,7 @@ const LearningDetails = () => {
           </div>
         </section>
       )}
+      <AdvisorFab />
     </div>
   );
 };

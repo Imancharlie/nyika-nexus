@@ -4,6 +4,7 @@ import ServiceCard from "@/components/ServiceCard";
 import QueryState from "@/components/QueryState";
 import { usePackages } from "@/hooks/useApi";
 import { useLanguage } from "@/i18n/LanguageContext";
+import AdvisorFab from "@/components/AdvisorFab";
 
 const Huduma = () => {
   const { t } = useLanguage();
@@ -30,6 +31,7 @@ const Huduma = () => {
         <MessagesSquare className="h-5 w-5" />
         {t("svc.need_advice")}
       </Link>
+      <AdvisorFab />
     </div>
   );
 };

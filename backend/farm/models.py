@@ -174,3 +174,40 @@ class Notification(models.Model):
 
 def notify(user, type_: str, title: str, body: str, link: str = "") -> Notification:
     return Notification.objects.create(user=user, type=type_, title=title, body=body, link=link)
+
+
+class ChatSession(models.Model):
+    """One ongoing conversation with the farming advisor."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="chat_sessions")
+    language = models.CharField(max_length=2, default="sw")
+    # Set when the farmer explicitly asks to switch language, so the app
+    # language does not override that choice on the next message.
+    language_locked = models.BooleanField(default=False)
+    article = models.ForeignKey(Article, null=True, blank=True, on_delete=models.SET_NULL, related_name="chat_sessions")
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return f"Chat {self.pk} · {self.user_id}"
+
+
+class ChatMessage(models.Model):
+    ROLES = [("user", "user"), ("assistant", "assistant")]
+
+    session = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name="messages")
+    role = models.CharField(max_length=10, choices=ROLES)
+    content = models.TextField()
+    suggestions = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        indexes = [models.Index(fields=["session", "created_at"])]
+
+    def __str__(self):
+        return f"{self.role}: {self.content[:40]}"

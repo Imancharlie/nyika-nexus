@@ -5,6 +5,7 @@ import {
   Box,
   GraduationCap,
   Home,
+  Sparkles,
   LayoutGrid,
   LogOut,
   Menu,
@@ -25,7 +26,7 @@ import type { StringKey } from "@/i18n/strings";
 import BottomNav from "@/components/layout/BottomNav";
 import "./dash.css";
 
-export type DashContext = { query: string };
+export type DashContext = { query: string; openMenu: () => void };
 
 const Wave = () => (
   <svg className="sw" viewBox="0 0 400 160" aria-hidden="true">
@@ -50,6 +51,7 @@ const CRUMBS: [string, StringKey][] = [
   ["/lipia", "dash.app_pay"],
   ["/vikundi", "dash.app_groups"],
   ["/huduma", "dash.app_services"],
+  ["/mshauri", "chat.title"],
   ["/ushauri", "dash.app_experts"],
   ["/wataalamu", "dash.app_experts"],
   ["/jifunze", "dash.app_learn"],
@@ -82,6 +84,7 @@ const DashLayout = () => {
   const [spy, setSpy] = useState("muhtasari");
 
   const home = location.pathname === "/";
+  const chat = location.pathname.startsWith("/mshauri");
   const crumb = CRUMBS.find(([prefix]) => location.pathname.startsWith(prefix))?.[1] ?? "shell.crumb";
   const name = user?.firstName || user?.username || "";
   const initial = (name || "A").slice(0, 1).toUpperCase();
@@ -146,7 +149,7 @@ const DashLayout = () => {
   };
 
   return (
-    <div className="dash">
+    <div className={chat ? "dash is-chat" : "dash"}>
       <a className="skip" href="#main">{t("shell.skip")}</a>
       <div className="scrim" onClick={() => setOpen(false)} />
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
@@ -179,6 +182,10 @@ const DashLayout = () => {
             <NavLink to="/jifunze" aria-current={location.pathname.startsWith("/jifunze") ? "true" : undefined}>
               <GraduationCap className="ic" strokeWidth={1.7} />
               <span>{t("dash.app_learn")}</span>
+            </NavLink>
+            <NavLink to="/mshauri">
+              <Sparkles className="ic" strokeWidth={1.7} />
+              <span>{t("shell.nav_mtaalamu")}</span>
             </NavLink>
             <NavLink to="/mipangilio">
               <Settings className="ic" strokeWidth={1.7} />
@@ -216,7 +223,7 @@ const DashLayout = () => {
         </aside>
 
         <div className="main">
-          <header className="top">
+          {!chat && <header className="top">
             <button
               className="ibtn menu-btn"
               type="button"
@@ -263,14 +270,14 @@ const DashLayout = () => {
                 </div>
               </Link>
             </div>
-          </header>
+          </header>}
 
           <main className="content" id="main">
-            <Outlet context={{ query } satisfies DashContext} />
+            <Outlet context={{ query, openMenu: () => setOpen(true) } satisfies DashContext} />
           </main>
         </div>
       </div>
-      <BottomNav />
+      {!chat && <BottomNav />}
     </div>
   );
 };

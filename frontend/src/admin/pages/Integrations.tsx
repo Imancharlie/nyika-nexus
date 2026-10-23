@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { CheckCircle2, CircleDashed, KeyRound, Lock, MessageSquareText, Wallet } from "lucide-react";
+import { CheckCircle2, CircleDashed, KeyRound, Lock, MessageSquareText, Sparkles, Wallet } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { adminApi, fmtDate, useAdminMutation, useAdminQuery } from "../lib";
 import { Btn, Card, Field, inputClass, PageTitle, Pill } from "../ui";
 import { toast } from "sonner";
 
 type Integration = {
-  kind: "sms" | "payment";
+  kind: "sms" | "payment" | "ai";
   provider: string;
   providerLabel: string;
   enabled: boolean;
@@ -30,6 +30,7 @@ const LABELS: Record<string, { label: string; hint?: string }> = {
   callback_url: { label: "Callback URL", hint: "Give this to the provider: https://<your-domain>/api/payments/webhook/" },
   currency: { label: "Currency", hint: "TZS" },
   webhook_secret: { label: "Webhook secret", hint: "Sent by the provider in the X-Webhook-Secret header" },
+  model: { label: "Model", hint: "Anthropic model id, e.g. claude-sonnet-4-5" },
 };
 
 const INFO = {
@@ -42,6 +43,11 @@ const INFO = {
     icon: Wallet,
     title: "Payments: gateway (placeholder)",
     text: "No provider chosen yet. Until one is connected, farmers' payment requests appear under Payments for you to confirm manually. When you pick a provider, enter its details here; the request format may need a small code adjustment for that provider.",
+  },
+  ai: {
+    icon: Sparkles,
+    title: "Farming advisor (Mshauri)",
+    text: "Paste your Anthropic API key from console.anthropic.com. The base URL is https://api.anthropic.com and the model starts as claude-sonnet-4-5 — change the model if your account uses another Claude id. Save, switch it on, then test the connection. Mshauri answers with Claude once it is on.",
   },
 };
 
@@ -122,7 +128,9 @@ const IntegrationCard = ({ item }: { item: Integration }) => {
             <Btn variant="outline" disabled={!item.configured || test.isPending} onClick={() => test.mutate(undefined)}>Send test SMS</Btn>
           </>
         ) : (
-          <Btn variant="outline" disabled={!item.configured || test.isPending} onClick={() => test.mutate(undefined)}>Check settings</Btn>
+          <Btn variant="outline" disabled={!item.configured || test.isPending} onClick={() => test.mutate(undefined)}>
+            {item.kind === "ai" ? "Test connection" : "Check settings"}
+          </Btn>
         )}
         <span className="ml-auto text-xs text-muted-foreground">Last updated {fmtDate(item.updatedAt)}</span>
       </div>
@@ -134,7 +142,7 @@ const Integrations = () => {
   const { data } = useAdminQuery<Integration[]>("/admin/integrations/");
   return (
     <div className="space-y-6">
-      <PageTitle title="API settings" subtitle="Connect SMS and payments. Keys are encrypted before they are saved and are never shown again in full." />
+      <PageTitle title="API settings" subtitle="Connect the farming advisor, SMS and payments. Keys are encrypted before they are saved and are never shown again in full." />
       {data?.map((item) => <IntegrationCard key={`${item.kind}-${item.updatedAt}`} item={item} />)}
     </div>
   );

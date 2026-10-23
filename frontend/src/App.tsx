@@ -20,6 +20,7 @@ import Huduma from "@/pages/Huduma";
 import ServiceDetails from "@/pages/ServiceDetails";
 import ServiceRequest from "@/pages/ServiceRequest";
 import Consultation from "@/pages/Consultation";
+import Mshauri from "@/pages/Mshauri";
 import Experts from "@/pages/Experts";
 import Post from "@/pages/Post";
 import CreatePost from "@/pages/CreatePost";
@@ -98,6 +99,7 @@ const App = () => (
                     <Route path="/huduma/:id" element={<ServiceDetails />} />
                     <Route path="/huduma/:id/ombi" element={<ServiceRequest />} />
                     <Route path="/ushauri" element={<Consultation />} />
+                    <Route path="/mshauri" element={<Mshauri />} />
                     <Route path="/wataalamu" element={<Experts />} />
                     <Route path="/post" element={<Post />} />
                     <Route path="/post/unda" element={<CreatePost />} />

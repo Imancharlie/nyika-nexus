@@ -4,6 +4,7 @@ import CategoryChip from "@/components/CategoryChip";
 import QueryState from "@/components/QueryState";
 import { useArticles, useCategories, useToggleSaveArticle } from "@/hooks/useApi";
 import { useLanguage } from "@/i18n/LanguageContext";
+import AdvisorFab from "@/components/AdvisorFab";
 
 const Jifunze = () => {
   const { data: allArticles = [], isLoading, isError, refetch } = useArticles();
@@ -49,6 +50,7 @@ const Jifunze = () => {
           ))}
         </div>
       </QueryState>
+      <AdvisorFab />
     </div>
   );
 };

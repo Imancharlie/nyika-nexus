@@ -388,6 +388,10 @@ class IntegrationDetailView(StaffMixin, APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         if kind == IntegrationSetting.KIND_PAYMENT:
             return Response({"ok": True, "detail": "Mipangilio imekamilika. Jaribu malipo halisi ili kuthibitisha."})
+        if kind == IntegrationSetting.KIND_AI:
+            from farm.advisor import ping
+            ok, detail = ping()
+            return Response({"ok": ok, "detail": detail}, status=status.HTTP_200_OK if ok else status.HTTP_400_BAD_REQUEST)
 
         from accounts.serializers import PhoneField
         from rest_framework.exceptions import ValidationError

@@ -1,10 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Clock3, ImagePlus, Sprout, X } from "lucide-react";
+import { CheckCircle2, Clock3, ImagePlus, Sparkles, Sprout, X } from "lucide-react";
 import { toast } from "sonner";
 import ImagePreview from "@/components/ImagePreview";
 import PageHeader from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import CategoryChip from "@/components/CategoryChip";
@@ -65,6 +64,19 @@ const Consultation = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader title={t("cons.title")} />
+
+      <Link
+        to="/mshauri"
+        className="flex items-center gap-3 rounded-3xl bg-gradient-to-br from-emerald to-deep p-4 text-white shadow-lg shadow-emerald/20"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+          <Sparkles className="h-5 w-5" />
+        </span>
+        <span className="min-w-0">
+          <span className="block font-bold">{t("chat.open")}</span>
+          <span className="mt-0.5 block text-sm text-white/80">{t("chat.open_text")}</span>
+        </span>
+      </Link>
 
       {sent && (
         <div className="flex items-start gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4">
@@ -138,9 +150,6 @@ const Consultation = () => {
           </div>
         </div>
 
-        <Button type="submit" disabled={createConsultation.isPending} className="w-full rounded-2xl py-5 text-base font-bold">
-          {t("cons.send")}
-        </Button>
       </form>
 
       <section>
@@ -188,12 +197,6 @@ const Consultation = () => {
         </div>
       </section>
 
-      <Link
-        to="/wataalamu"
-        className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/50 bg-primary/5 px-4 py-4 text-sm font-semibold text-primary"
-      >
-        {t("cons.all_experts")}
-      </Link>
     </div>
   );
 };

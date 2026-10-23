@@ -173,3 +173,9 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "loggers": {"agrimika": {"handlers": ["console"], "level": "INFO"}},
 }
+
+# Fallback only. The admin dashboard (Anthropic) is what Mshauri uses when it is switched on.
+AI_API_KEY = env("AI_API_KEY")
+AI_BASE_URL = env("AI_BASE_URL", "https://api.anthropic.com").rstrip("/")
+AI_MODEL = env("AI_MODEL", "claude-sonnet-4-5")
+AI_TIMEOUT = 55

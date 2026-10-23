@@ -20,13 +20,22 @@ PROVIDER_FIELDS = {
             "required": ["provider_name", "base_url", "api_key"],
         },
     },
+    "ai": {
+        "anthropic": {
+            "label": "Farming advisor (Anthropic)",
+            "public": ["base_url", "model"],
+            "secret": ["api_key"],
+            "required": ["api_key", "base_url", "model"],
+        },
+    },
 }
 
 
 class IntegrationSetting(models.Model):
     KIND_SMS = "sms"
     KIND_PAYMENT = "payment"
-    KINDS = [(KIND_SMS, "SMS"), (KIND_PAYMENT, "Payments")]
+    KIND_AI = "ai"
+    KINDS = [(KIND_SMS, "SMS"), (KIND_PAYMENT, "Payments"), (KIND_AI, "Farming advisor")]
 
     kind = models.CharField(max_length=20, choices=KINDS, unique=True)
     provider = models.CharField(max_length=30)
@@ -36,7 +45,8 @@ class IntegrationSetting(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
-    DEFAULT_PROVIDER = {KIND_SMS: "beem", KIND_PAYMENT: "generic"}
+    DEFAULT_PROVIDER = {KIND_SMS: "beem", KIND_PAYMENT: "generic", KIND_AI: "anthropic"}
+    AI_DEFAULTS = {"base_url": "https://api.anthropic.com", "model": "claude-sonnet-4-5"}
 
     def __str__(self):
         return f"{self.kind}:{self.provider}"
@@ -44,6 +54,22 @@ class IntegrationSetting(models.Model):
     @classmethod
     def get(cls, kind: str) -> "IntegrationSetting":
         obj, _ = cls.objects.get_or_create(kind=kind, defaults={"provider": cls.DEFAULT_PROVIDER[kind]})
+        if kind == cls.KIND_AI:
+            config = dict(obj.config or {})
+            changed = False
+            if obj.provider not in PROVIDER_FIELDS[cls.KIND_AI]:
+                obj.provider = cls.DEFAULT_PROVIDER[cls.KIND_AI]
+                changed = True
+            openai_bases = {"https://api.openai.com/v1", "https://api.openai.com"}
+            if not str(config.get("base_url") or "").strip() or str(config.get("base_url")).rstrip("/") in openai_bases:
+                config["base_url"] = cls.AI_DEFAULTS["base_url"]
+                changed = True
+            if not str(config.get("model") or "").strip() or config.get("model") == "gpt-4o-mini":
+                config["model"] = cls.AI_DEFAULTS["model"]
+                changed = True
+            if changed:
+                obj.config = config
+                obj.save(update_fields=["provider", "config"])
         return obj
 
     @property
