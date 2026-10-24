@@ -2,7 +2,13 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from .advisor import AdvisorMessageView, AdvisorResetView, AdvisorSessionView
+from .advisor import (
+    AdvisorMessageView,
+    AdvisorResetView,
+    AdvisorSessionListView,
+    AdvisorSessionOpenView,
+    AdvisorSessionView,
+)
 
 router = DefaultRouter(trailing_slash=True)
 router.register("packages", views.ServicePackageViewSet, basename="package")
@@ -18,4 +24,6 @@ urlpatterns = [
     path("advisor/", AdvisorSessionView.as_view()),
     path("advisor/messages/", AdvisorMessageView.as_view()),
     path("advisor/reset/", AdvisorResetView.as_view()),
+    path("advisor/sessions/", AdvisorSessionListView.as_view()),
+    path("advisor/sessions/<int:pk>/", AdvisorSessionOpenView.as_view()),
 ] + router.urls

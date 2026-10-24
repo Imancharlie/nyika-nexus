@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Menu, RefreshCw, Send } from "lucide-react";
+import { ArrowLeft, Clock, Menu, MessageSquare, RefreshCw, Send, X } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { DashContext } from "@/layouts/DashLayout";
@@ -25,6 +25,7 @@ type ApiMessage = {
 
 type SessionPayload = {
   id: number | null;
+  title?: string;
   language: "sw" | "en";
   articleId: string | null;
   articleTitle: string | null;
@@ -33,6 +34,7 @@ type SessionPayload = {
 
 type ReplyPayload = {
   sessionId: number;
+  title?: string;
   language: "sw" | "en";
   articleId: string | null;
   articleTitle: string | null;
@@ -40,8 +42,134 @@ type ReplyPayload = {
   assistantMessage: ApiMessage;
 };
 
+type ChatSummary = {
+  id: number;
+  title: string;
+  articleTitle: string | null;
+  updatedAt: string;
+  messageCount: number;
+  active: boolean;
+};
+
 const NUMBERED_RE = /^\s*(\d+)[.)]\s+(.*)$/;
-const BULLET_RE = /^\s*[-•*]\s+(.*)$/;
+const BULLET_RE = /^\s*(?:[-•]|\*(?!\*))\s+(.*)$/;
+
+type Tone = "user" | "assistant";
+
+const safeHref = (url: string): string | null => {
+  const trimmed = url.trim();
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^www\./i.test(trimmed)) return `https://${trimmed}`;
+  return null;
+};
+
+const linkClass = (tone: Tone) =>
+  tone === "user"
+    ? "underline underline-offset-2 break-all"
+    : "font-medium text-primary underline decoration-primary/40 underline-offset-2 break-all";
+
+const renderAnchor = (label: string, href: string, key: string, tone: Tone): ReactNode => {
+  const className = linkClass(tone);
+  if (href.startsWith("/")) {
+    return (
+      <Link key={key} to={href} className={className}>
+        {label}
+      </Link>
+    );
+  }
+  let internal: string | null = null;
+  try {
+    const parsed = new URL(href);
+    if (parsed.origin === window.location.origin) {
+      internal = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+  } catch {
+    internal = null;
+  }
+  if (internal) {
+    return (
+      <Link key={key} to={internal} className={className}>
+        {label}
+      </Link>
+    );
+  }
+  return (
+    <a key={key} href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      {label}
+    </a>
+  );
+};
+
+const renderInline = (text: string, keyBase: string, tone: Tone): ReactNode[] => {
+  const nodes: ReactNode[] = [];
+  let plain = "";
+  let index = 0;
+  let seq = 0;
+  const pushPlain = () => {
+    if (!plain) return;
+    nodes.push(plain);
+    plain = "";
+  };
+
+  while (index < text.length) {
+    if (text.startsWith("**", index)) {
+      const end = text.indexOf("**", index + 2);
+      if (end !== -1) {
+        pushPlain();
+        const inner = text.slice(index + 2, end);
+        nodes.push(
+          <strong key={`${keyBase}-b-${seq}`} className="font-semibold">
+            {renderInline(inner, `${keyBase}-b-${seq}`, tone)}
+          </strong>,
+        );
+        seq += 1;
+        index = end + 2;
+        continue;
+      }
+    }
+
+    const markdown = text.slice(index).match(/^\[([^\]]+)\]\(([^)\s]+)\)/);
+    if (markdown) {
+      const href = safeHref(markdown[2]);
+      if (href) {
+        pushPlain();
+        nodes.push(renderAnchor(markdown[1], href, `${keyBase}-a-${seq}`, tone));
+        seq += 1;
+        index += markdown[0].length;
+        continue;
+      }
+    }
+
+    const url = text.slice(index).match(/^(https?:\/\/[^\s<]+|www\.[^\s<]+)/i);
+    if (url) {
+      let raw = url[1];
+      let trail = "";
+      while (/[.,;:!?]$/.test(raw)) {
+        trail = raw.slice(-1) + trail;
+        raw = raw.slice(0, -1);
+      }
+      if (raw.endsWith(")") && !raw.includes("(")) {
+        trail = `)${trail}`;
+        raw = raw.slice(0, -1);
+      }
+      const href = safeHref(raw);
+      if (href && raw) {
+        pushPlain();
+        nodes.push(renderAnchor(raw, href, `${keyBase}-u-${seq}`, tone));
+        seq += 1;
+        plain += trail;
+        index += url[1].length;
+        continue;
+      }
+    }
+
+    plain += text[index];
+    index += 1;
+  }
+  pushPlain();
+  return nodes;
+};
 
 const toMessage = (message: ApiMessage): ChatMessage => ({
   id: String(message.id),
@@ -51,7 +179,7 @@ const toMessage = (message: ApiMessage): ChatMessage => ({
   createdAt: message.createdAt,
 });
 
-const renderRichText = (content: string): ReactNode[] => {
+const renderRichText = (content: string, tone: Tone = "assistant"): ReactNode[] => {
   const nodes: ReactNode[] = [];
   const lines = (content || "").split("\n");
   let numbered: { key: string; marker: string; text: string }[] = [];
@@ -65,7 +193,7 @@ const renderRichText = (content: string): ReactNode[] => {
           {numbered.map((item) => (
             <li key={item.key} className="flex gap-2">
               <span className="shrink-0 font-semibold tabular-nums opacity-80">{item.marker}.</span>
-              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">{item.text}</span>
+              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">{renderInline(item.text, item.key, tone)}</span>
             </li>
           ))}
         </ol>,
@@ -78,7 +206,7 @@ const renderRichText = (content: string): ReactNode[] => {
           {bullets.map((item) => (
             <li key={item.key} className="flex gap-2">
               <span className="shrink-0 opacity-70">•</span>
-              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">{item.text}</span>
+              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">{renderInline(item.text, item.key, tone)}</span>
             </li>
           ))}
         </ul>,
@@ -107,7 +235,7 @@ const renderRichText = (content: string): ReactNode[] => {
     }
     nodes.push(
       <p key={`p-${index}`} className="whitespace-pre-wrap break-words">
-        {line}
+        {renderInline(line, `p-${index}`, tone)}
       </p>,
     );
   });
@@ -136,11 +264,18 @@ const Mshauri = () => {
   const { openMenu } = useOutletContext<DashContext>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const arrivingFromArticle = Boolean(searchParams.get("q")?.trim() && searchParams.get("n"));
+  const pendingArticle = useRef(arrivingFromArticle);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [sessionId, setSessionId] = useState<number | null>(null);
+  const [sessionTitle, setSessionTitle] = useState("");
   const [articleId, setArticleId] = useState<string | null>(null);
   const [articleTitle, setArticleTitle] = useState<string | null>(null);
   const [input, setInput] = useState("");
-  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(!arrivingFromArticle);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<ChatSummary[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [generation, setGeneration] = useState(0);
@@ -217,16 +352,26 @@ const Mshauri = () => {
     el.style.height = `${Math.min(el.scrollHeight, window.innerHeight * 0.3)}px`;
   }, [input]);
 
+  const applySession = (data: SessionPayload) => {
+    setSessionId(data.id);
+    setSessionTitle(data.title || "");
+    setMessages(data.messages.map(toMessage));
+    setArticleId(data.articleId);
+    setArticleTitle(data.articleTitle);
+  };
+
   useEffect(() => {
+    if (pendingArticle.current) {
+      setLoadingHistory(false);
+      return;
+    }
     let ignore = false;
     setLoadingHistory(true);
     api
       .get<SessionPayload>("/advisor/")
       .then((data) => {
         if (ignore) return;
-        setMessages(data.messages.map(toMessage));
-        setArticleId(data.articleId);
-        setArticleTitle(data.articleTitle);
+        applySession(data);
       })
       .catch(() => {
         if (!ignore) {
@@ -248,7 +393,7 @@ const Mshauri = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generation]);
 
-  const send = async (text: string, nextArticleId?: string | null) => {
+  const send = async (text: string, nextArticleId?: string | null, fresh = false) => {
     const trimmed = text.trim();
     if (!trimmed || sending.current) return;
     sending.current = true;
@@ -256,8 +401,13 @@ const Mshauri = () => {
     setIsTyping(true);
     setInput("");
     const localId = `local-${Date.now()}`;
+    if (fresh) {
+      setSessionId(null);
+      setSessionTitle("");
+      setArticleTitle(null);
+    }
     setMessages((prev) => [
-      ...prev,
+      ...(fresh ? [] : prev),
       { id: localId, role: "user", content: trimmed, createdAt: new Date().toISOString() },
     ]);
     textareaRef.current?.focus();
@@ -266,7 +416,11 @@ const Mshauri = () => {
         content: trimmed,
         articleId: nextArticleId || undefined,
         language: langRef.current,
+        sessionId: fresh ? undefined : sessionId ?? undefined,
+        fresh: fresh || undefined,
       });
+      setSessionId(data.sessionId);
+      setSessionTitle(data.title || "");
       setArticleId(data.articleId);
       setArticleTitle(data.articleTitle);
       setMessages((prev) => [
@@ -294,9 +448,14 @@ const Mshauri = () => {
     const nonce = searchParams.get("n");
     if (!question || !nonce || seeded.current === nonce) return;
     seeded.current = nonce;
+    pendingArticle.current = false;
     const fromArticle = searchParams.get("article");
     navigate("/mshauri", { replace: true });
-    void send(question, fromArticle);
+    setSessionId(null);
+    setSessionTitle("");
+    setArticleId(fromArticle);
+    setArticleTitle(null);
+    void send(question, fromArticle, true);
     // `send` closes over the latest setters; the nonce guard stops a second post.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingHistory, searchParams, navigate]);
@@ -310,9 +469,46 @@ const Mshauri = () => {
       /* The next load shows an empty thread even if the reset call fails. */
     }
     setMessages([]);
+    setSessionId(null);
+    setSessionTitle("");
     setArticleId(null);
     setArticleTitle(null);
     setGeneration((value) => value + 1);
+  };
+
+  const showHistory = async () => {
+    setHistoryOpen(true);
+    setHistoryLoading(true);
+    try {
+      const data = await api.get<{ sessions: ChatSummary[] }>("/advisor/sessions/");
+      setHistory(data.sessions);
+    } catch {
+      setHistory([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const openChat = async (id: number) => {
+    if (loading || id === sessionId) {
+      setHistoryOpen(false);
+      return;
+    }
+    setHistoryOpen(false);
+    setLoadingHistory(true);
+    try {
+      const data = await api.get<SessionPayload>(`/advisor/sessions/${id}/`);
+      applySession(data);
+    } catch {
+      setMessages([{
+        id: "load-error",
+        role: "assistant",
+        content: t("chat.error"),
+        createdAt: new Date().toISOString(),
+      }]);
+    } finally {
+      setLoadingHistory(false);
+    }
   };
 
   const last = messages[messages.length - 1];
@@ -321,7 +517,7 @@ const Mshauri = () => {
   );
 
   return (
-    <div className="advisor-chat">
+    <div className="advisor-chat relative">
         <header className="chat-bar flex shrink-0 items-center gap-1 border-b border-border bg-white px-2">
           <button
             type="button"
@@ -341,15 +537,27 @@ const Mshauri = () => {
           </button>
           <div className="min-w-0 flex-1 px-1">
             <p className="truncate text-base font-bold text-deep">{t("chat.title")}</p>
-            {articleId && (
+            {articleId ? (
               <Link
                 to={`/jifunze/${articleId}`}
                 className="block truncate text-xs font-medium text-primary underline decoration-primary/30 underline-offset-2"
               >
                 {t("chat.from_article")}: {articleTitle}
               </Link>
-            )}
+            ) : sessionTitle ? (
+              <p className="truncate text-xs font-medium text-muted-foreground">{sessionTitle}</p>
+            ) : null}
           </div>
+          <button
+            type="button"
+            onClick={() => void showHistory()}
+            disabled={loadingHistory}
+            aria-label={t("chat.history")}
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-deep disabled:opacity-50"
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("chat.history")}</span>
+          </button>
           <button
             type="button"
             onClick={() => void startNew()}
@@ -386,7 +594,7 @@ const Mshauri = () => {
                         : "rounded-bl-none border border-primary/10 bg-white text-foreground"
                     }`}
                   >
-                    {renderRichText(message.content)}
+                    {renderRichText(message.content, message.role)}
                   </div>
                   {showChips && message.id === last?.id && (
                     <SuggestionRow
@@ -436,6 +644,71 @@ const Mshauri = () => {
             </button>
           </div>
         </form>
+
+        {historyOpen && (
+          <div className="absolute inset-0 z-20 bg-black/25" onClick={() => setHistoryOpen(false)}>
+            <div
+              className="absolute right-0 top-0 flex h-full w-[min(20rem,88%)] flex-col bg-white shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <h2 className="text-base font-semibold text-deep">{t("chat.history")}</h2>
+                <button
+                  type="button"
+                  onClick={() => setHistoryOpen(false)}
+                  aria-label={t("c.back")}
+                  className="grid h-8 w-8 place-items-center rounded-full text-deep"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto p-3">
+                {historyLoading ? (
+                  <div className="py-8">
+                    <Typing />
+                  </div>
+                ) : history.length === 0 ? (
+                  <div className="px-2 py-10 text-center text-sm text-muted-foreground">
+                    <MessageSquare className="mx-auto mb-3 h-10 w-10 opacity-30" />
+                    <p className="font-medium text-deep">{t("chat.history_empty")}</p>
+                    <p className="mt-1">{t("chat.history_hint")}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {history.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => void openChat(item.id)}
+                        className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                          item.id === sessionId
+                            ? "border-primary bg-chip text-primary"
+                            : "border-border bg-white hover:bg-chip/60"
+                        }`}
+                      >
+                        <p className="truncate text-sm font-semibold">
+                          {item.title || t("chat.untitled")}
+                        </p>
+                        {item.articleTitle && (
+                          <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.articleTitle}</p>
+                        )}
+                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {new Date(item.updatedAt).toLocaleDateString(lang === "sw" ? "sw-TZ" : "en-GB", {
+                            day: "numeric",
+                            month: "short",
+                          })}
+                          <span aria-hidden="true">·</span>
+                          {item.messageCount} {t("chat.messages")}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

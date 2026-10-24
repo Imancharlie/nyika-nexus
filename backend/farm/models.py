@@ -185,6 +185,7 @@ class ChatSession(models.Model):
     # language does not override that choice on the next message.
     language_locked = models.BooleanField(default=False)
     article = models.ForeignKey(Article, null=True, blank=True, on_delete=models.SET_NULL, related_name="chat_sessions")
+    title = models.CharField(max_length=80, blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
